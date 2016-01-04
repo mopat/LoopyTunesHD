@@ -3,6 +3,7 @@ package com.example.patrick.loopytunesand;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,11 +16,12 @@ public class Sample {
     private AudioTrack at;
     private byte[] byteData;
     private int bufferSize;
+    private String filePath;
 
     public Sample(String filePath) {
         // We keep temporarily filePath globally as we have only two sample sounds now..
         if (filePath != null) {
-
+            this.filePath = filePath;
 
 //Reading the file..
             byte[] byteData = null;
@@ -42,6 +44,7 @@ public class Sample {
                     AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
             this.at = at;
             this.byteData = byteData;
+            Log.d("buffersize", String.valueOf(bufferSize));
             this.bufferSize = bufferSize;
         }
     }
@@ -56,5 +59,9 @@ public class Sample {
 
     public int getBufferSize(){
         return bufferSize;
+    }
+
+    public String filePath(){
+        return filePath;
     }
 }

@@ -4,6 +4,8 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Environment;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
@@ -26,7 +28,7 @@ interface NoMetronomeClick {
     void noMetronomeClick();
 }
 
-public class Looper extends AppCompatActivity implements MetronomeClick, NoMetronomeClick {
+public class Looper extends AppCompatActivity implements MetronomeClick {
     private Button startMetronome, stopMetronome, stopRec;
     private Button sampleButtons[];
     private int bpm, beatCount, loopCount, clickedLoopCount;
@@ -67,7 +69,6 @@ public class Looper extends AppCompatActivity implements MetronomeClick, NoMetro
         metronomeThread = new Thread(m);
         metronomeThread.start();
         m.addMetronomeClickListener(this);
-        m.addMetronomenNoClickListener(this);
     }
 
     private void initListeners() {
@@ -116,6 +117,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, NoMetro
     private void addSample() {
         Sample sample = new Sample(r.getSamplePath());
         samples.add(sample);
+
     }
 
     private void getBPM() {
@@ -130,6 +132,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, NoMetro
     public void metronomeClick() {
         //Log.d("CLICK", "CLICK");
         this.runOnUiThread(new Runnable() {
+
             @Override
             public void run() {
                 // This code will always run on the UI thread, therefore is safe to modify UI elements.
@@ -144,6 +147,9 @@ public class Looper extends AppCompatActivity implements MetronomeClick, NoMetro
                 if (beatCount == 4) {
                     beatCount = 0;
                     stopSamples();
+                    if (loopCount == 1) {
+                        m.setBarTimeNano();
+                    }
                     playSamples();
 
                 }
@@ -172,11 +178,6 @@ public class Looper extends AppCompatActivity implements MetronomeClick, NoMetro
 
     private void playSamples() {
         p.playSamples(samples);
-    }
-
-    @Override
-    public void noMetronomeClick() {
-
     }
 
     public void pr(String msg) {

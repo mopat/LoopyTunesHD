@@ -26,7 +26,7 @@ public class Recorder {
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     private AudioRecord recorder = null;
-    private Thread recordingThread = null;
+    private Thread recordingThread, stopRecordingThread = null;
     private boolean isRecording = false;
     private String samplePath = null;
     long recordTime, st;
@@ -85,7 +85,7 @@ public class Recorder {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
+        System.out.print("STOPRECORD");
         while (isRecording) {
             // gets the voice output from microphone to byte format
 
@@ -108,23 +108,26 @@ public class Recorder {
     }
 
     public void stopRecording() {
-        System.out.print("STOPRECORD");
-
-        // stops the recording activity
-        if (null != recorder) {
-            isRecording = false;
-            recorder.stop();
-            recorder.release();
-            recorder = null;
-            recordingThread = null;
-        }
-        recordTime = System.currentTimeMillis() - st;
-        Log.d("RECORDTIME", String.valueOf(recordTime));
+        stopRecordingThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // stops the recording activity
+                if (null != recorder) {
+                    isRecording = false;
+                    recorder.stop();
+                    recorder.release();
+                    recorder = null;
+                    recordingThread = null;
+                }
+                recordTime = System.currentTimeMillis() - st;
+                Log.d("RECORDTIME", String.valueOf(recordTime));
+            }
+        });
+        stopRecordingThread.start();
     }
 
 
-
-    public String getSamplePath(){
+    public String getSamplePath() {
         return samplePath;
     }
 }

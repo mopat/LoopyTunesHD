@@ -28,21 +28,22 @@ public class Metronome implements Runnable {
 
     @Override
     public void run() {
-        while(true){
+        while (true) {
             runMetronome();
         }
     }
 
-      public void runMetronome(){
-        int startTime = (int) System.nanoTime();
+    public void runMetronome() {
+        long startTime = System.nanoTime();
         while (running) {
-            int curTime = (int) System.nanoTime();
+            long curTime = System.nanoTime();
             if (curTime - startTime >= barTimeNano) {
                 startTime = curTime;
                 click();
+            } else {
+                    noClick();
             }
-            else
-                noClick();
+
         }
     }
 
@@ -58,10 +59,14 @@ public class Metronome implements Runnable {
             running = false;
     }
 
-    private void bpmToNano(){
+    public void setBarTimeNano() {
+        //barTimeNano -= 380000000;
+    }
+
+    private void bpmToNano() {
         long barTimeInMs = 60000 / bpm;
         Log.d("BARTIME", String.valueOf(barTimeInMs));
-        barTimeNano = barTimeInMs*1000000;
+        barTimeNano = barTimeInMs * 1000000;
     }
 
     public void addMetronomeClickListener(MetronomeClick listener) {
@@ -72,13 +77,14 @@ public class Metronome implements Runnable {
         noClicklisteners.add(listener);
     }
 
-    void click(){
-        for(MetronomeClick listener : clickListeners){
+    void click() {
+        for (MetronomeClick listener : clickListeners) {
             listener.metronomeClick();
         }
     }
-    void noClick(){
-        for(NoMetronomeClick listener : noClicklisteners){
+
+    void noClick() {
+        for (NoMetronomeClick listener : noClicklisteners) {
             listener.noMetronomeClick();
         }
     }
