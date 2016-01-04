@@ -87,7 +87,7 @@ public class Recorder {
             // gets the voice output from microphone to byte format
 
             recorder.read(sData, 0, BufferElements2Rec);
-            System.out.println("Short wirting to file" + sData.toString());
+            //System.out.println("Short wirting to file" + sData.toString());
             try {
                 // // writes the data to file from buffer
                 // // stores the voice buffer
@@ -115,41 +115,7 @@ public class Recorder {
         }
     }
 
-    public void playShortAudioFileViaAudioTrack(String filePath) throws IOException {
-// We keep temporarily filePath globally as we have only two sample sounds now..
-        if (filePath == null)
-            return;
 
-//Reading the file..
-        byte[] byteData = null;
-        File file = null;
-        file = new File(filePath); // for ex. path= "/sdcard/samplesound.pcm" or "/sdcard/samplesound.wav"
-        byteData = new byte[(int) file.length()];
-        FileInputStream in = null;
-        try {
-            in = new FileInputStream(file);
-            in.read(byteData);
-            in.close();
-
-        } catch (FileNotFoundException e) {
-// TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-// Set and push to audio track..
-        int intSize = android.media.AudioTrack.getMinBufferSize(44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
-                AudioFormat.ENCODING_PCM_16BIT);
-        AudioTrack at = new AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
-                AudioFormat.ENCODING_PCM_16BIT, intSize, AudioTrack.MODE_STREAM);
-        if (at != null) {
-            at.play();
-// Write the byte array to the track
-            at.write(byteData, 0, byteData.length);
-            at.stop();
-            at.release();
-        } else
-            Log.d("TCAudio", "audio track is not initialised ");
-
-    }
 
     public String getSamplePath(){
         return samplePath;

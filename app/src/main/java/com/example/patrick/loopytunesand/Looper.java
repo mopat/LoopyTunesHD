@@ -13,6 +13,7 @@ import android.widget.Button;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 interface MetronomeClick {
@@ -24,12 +25,14 @@ interface NoMetronomeClick {
 }
 
 public class Looper extends AppCompatActivity implements MetronomeClick, NoMetronomeClick {
-    Button startMetronome, stopMetronome, stopRec;
-    Button sampleButtons[];
-    int bpm;
-    Metronome m;
-    Thread metronomeThread;
-    Recorder r;
+    private Button startMetronome, stopMetronome, stopRec;
+    private Button sampleButtons[];
+    private int bpm;
+    private Metronome m;
+    private Thread metronomeThread;
+    private Recorder r;
+    private Player p;
+    private ArrayList<Sample> samples = new ArrayList<Sample>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, NoMetro
         stopMetronome = (Button) findViewById(R.id.stop_metronome);
         stopRec = (Button) findViewById(R.id.stop_rec);
         r = new Recorder();
+        p = new Player();
         sampleButtons = new Button[]{(Button) findViewById(R.id.sample_one), (Button) findViewById(R.id.sample_two), (Button) findViewById(R.id.sample_three)};
         metronomeThread = new Thread(m);
         metronomeThread.start();
@@ -87,11 +91,14 @@ public class Looper extends AppCompatActivity implements MetronomeClick, NoMetro
             @Override
             public void onClick(View v) {
                 r.stopRecording();
-                try {
-                    r.playShortAudioFileViaAudioTrack(r.getSamplePath());
-                } catch (IOException e) {
+                Sample sample = new Sample(r.getSamplePath());
+                try{
+                    p.playSample(sample);
+                }
+                catch (IOException e) {
                     e.printStackTrace();
                 }
+
             }
         });
     }
