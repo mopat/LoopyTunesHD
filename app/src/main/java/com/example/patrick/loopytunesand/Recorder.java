@@ -29,6 +29,7 @@ public class Recorder {
     private Thread recordingThread = null;
     private boolean isRecording = false;
     private String samplePath = null;
+    long recordTime, st;
     int bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
             RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 
@@ -36,6 +37,7 @@ public class Recorder {
     int BytesPerElement = 2; // 2 bytes in 16bit format
 
     public void startRecording() {
+        System.out.print("STARTRECORD");
 
         recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                 RECORDER_SAMPLERATE, RECORDER_CHANNELS,
@@ -49,6 +51,7 @@ public class Recorder {
             }
         }, "AudioRecorder Thread");
         recordingThread.start();
+        st = System.currentTimeMillis();
     }
 
     //convert short to byte
@@ -105,6 +108,8 @@ public class Recorder {
     }
 
     public void stopRecording() {
+        System.out.print("STOPRECORD");
+
         // stops the recording activity
         if (null != recorder) {
             isRecording = false;
@@ -113,6 +118,8 @@ public class Recorder {
             recorder = null;
             recordingThread = null;
         }
+        recordTime = System.currentTimeMillis() - st;
+        Log.d("RECORDTIME", String.valueOf(recordTime));
     }
 
 

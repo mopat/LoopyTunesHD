@@ -7,48 +7,38 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.patrick.loopytunesand.Looper">
+    tools:context="com.example.patrick.loopytunesand.Looper"
+    android:weightSum="1">
 
     <Button
         android:id="@+id/start_metronome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start_M"></Button>
+        android:text="Start_M"/>
 
     <Button
         android:id="@+id/stop_metronome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Stop_M"></Button>
-
+        android:text="Stop_M"/>
 
     <Button
         android:id="@+id/sample_one"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:text="1"></Button>
+        android:text="1" />
+
+    <TextView
+    android:id="@+id/metronome_tv"
+    android:layout_width="100dp"
+    android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/stop_rec"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="200dp"
-        android:text="STOPREC"></Button>
-
-    <Button
-        android:id="@+id/sample_two"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:text="2"></Button>
-
-    <Button
-        android:id="@+id/sample_three"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:text="3"></Button>
+        android:text="STOPREC"
+        android:layout_gravity="center_vertical"/>
 
 
 </LinearLayout>

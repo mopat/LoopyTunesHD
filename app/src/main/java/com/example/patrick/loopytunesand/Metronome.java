@@ -60,6 +60,7 @@ public class Metronome implements Runnable {
 
     private void bpmToNano(){
         long barTimeInMs = 60000 / bpm;
+        Log.d("BARTIME", String.valueOf(barTimeInMs));
         barTimeNano = barTimeInMs*1000000;
     }
 

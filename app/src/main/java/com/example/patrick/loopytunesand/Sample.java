@@ -14,6 +14,7 @@ import java.io.IOException;
 public class Sample {
     private AudioTrack at;
     private byte[] byteData;
+    private int bufferSize;
 
     public Sample(String filePath) {
         // We keep temporarily filePath globally as we have only two sample sounds now..
@@ -35,12 +36,13 @@ public class Sample {
                 e.printStackTrace();
             }
 // Set and push to audio track..
-            int intSize = android.media.AudioTrack.getMinBufferSize(44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
+            int bufferSize = android.media.AudioTrack.getMinBufferSize(44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
                     AudioFormat.ENCODING_PCM_16BIT);
             AudioTrack at = new AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT, intSize, AudioTrack.MODE_STREAM);
+                    AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
             this.at = at;
             this.byteData = byteData;
+            this.bufferSize = bufferSize;
         }
     }
 
@@ -50,5 +52,9 @@ public class Sample {
 
     public byte[] getByteData() {
         return byteData;
+    }
+
+    public int getBufferSize(){
+        return bufferSize;
     }
 }
