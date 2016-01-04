@@ -4,14 +4,16 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
-import static android.app.PendingIntent.getActivity;
+import java.io.File;
+import java.io.IOException;
+
 
 interface MetronomeClick {
     void metronomeClick();
@@ -22,17 +24,22 @@ interface NoMetronomeClick {
 }
 
 public class Looper extends AppCompatActivity implements MetronomeClick, NoMetronomeClick {
-    Button startMetronome, stopMetronome;
+    Button startMetronome, stopMetronome, stopRec;
     Button sampleButtons[];
     int bpm;
     Metronome m;
     Thread metronomeThread;
+    Recorder r;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_looper);
 
+
+        if (!Absolutes.DIRECTORY.exists()) {
+            if (!Absolutes.DIRECTORY.mkdir()) ; //directory is created;
+        }
         getBPM();
         init();
         initListeners();
@@ -42,7 +49,9 @@ public class Looper extends AppCompatActivity implements MetronomeClick, NoMetro
         m = new Metronome(bpm);
         startMetronome = (Button) findViewById(R.id.start_metronome);
         stopMetronome = (Button) findViewById(R.id.stop_metronome);
-        sampleButtons = new Button[]{(Button)findViewById(R.id.sample_one), (Button)findViewById(R.id.sample_two), (Button)findViewById(R.id.sample_three)};
+        stopRec = (Button) findViewById(R.id.stop_rec);
+        r = new Recorder();
+        sampleButtons = new Button[]{(Button) findViewById(R.id.sample_one), (Button) findViewById(R.id.sample_two), (Button) findViewById(R.id.sample_three)};
         metronomeThread = new Thread(m);
         metronomeThread.start();
         m.addMetronomeClickListener(this);
@@ -71,6 +80,18 @@ public class Looper extends AppCompatActivity implements MetronomeClick, NoMetro
             @Override
             public void onClick(View v) {
                 Log.d("FIRST", "FIRST");
+                r.startRecording();
+            }
+        });
+        stopRec.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                r.stopRecording();
+                try {
+                    r.playShortAudioFileViaAudioTrack(r.getSamplePath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -90,7 +111,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, NoMetro
             @Override
             public void run() {
                 // This code will always run on the UI thread, therefore is safe to modify UI elements.
-                ObjectAnimator colorFade = ObjectAnimator.ofObject(getApplication(),"backgroundColor", new ArgbEvaluator(), Color.argb(255, 255, 255, 255), 0xff000000);
+                ObjectAnimator colorFade = ObjectAnimator.ofObject(getApplication(), "backgroundColor", new ArgbEvaluator(), Color.argb(255, 255, 255, 255), 0xff000000);
                 colorFade.setDuration(7000);
                 colorFade.start();
             }
@@ -100,6 +121,11 @@ public class Looper extends AppCompatActivity implements MetronomeClick, NoMetro
 
     @Override
     public void noMetronomeClick() {
+
+    }
+
+    public void pr(String msg){
+        Log.d(msg, msg);
 
     }
 }

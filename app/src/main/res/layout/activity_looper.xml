@@ -30,6 +30,13 @@
         android:text="1"></Button>
 
     <Button
+        android:id="@+id/stop_rec"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        android:text="STOPREC"></Button>
+
+    <Button
         android:id="@+id/sample_two"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
