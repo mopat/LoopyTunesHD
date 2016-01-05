@@ -39,6 +39,7 @@ public class Metronome implements Runnable {
         while (running) {
             long curTime = System.currentTimeMillis();
             if (curTime - startTime >= barTimeNano) {
+                Log.d("TIMECUR", String.valueOf(curTime-startTime));
                 startTime = curTime;
                 click();
             }

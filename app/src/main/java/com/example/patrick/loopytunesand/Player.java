@@ -54,13 +54,13 @@ public class Player {
 
 
     public void playSamples(final ArrayList<Sample> samples) {
-        playThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < samples.size(); i++) {
 
+        for (int i = 0; i < samples.size(); i++) {
+            final Sample sample = samples.get(i);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
 
-                    Sample sample = samples.get(i);
                    /* FileInputStream fis = null;
                     try {
                         fis = new FileInputStream(sample.filePath());
@@ -217,7 +217,7 @@ public class Player {
                             at.play();
                             at.write(byteData, 0, ret);
 
-                          //  Log.d("BYTESREAD", String.valueOf(bytesread));
+                            //  Log.d("BYTESREAD", String.valueOf(bytesread));
                             bytesread += ret;
                         } else break;
                     }
@@ -229,15 +229,11 @@ public class Player {
 
                     at.stop();
                     at.release();
+                }
+            }).start();
 
 
-            }
-
-                Log.d("LATENCY", String.valueOf(lag));
-            }
-
-
-        });
-        playThread.start();
+        }
+        Log.d("LATENCY", String.valueOf(lag));
     }
 }

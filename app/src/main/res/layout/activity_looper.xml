@@ -10,6 +10,12 @@
     tools:context="com.example.patrick.loopytunesand.Looper"
     android:weightSum="1">
 
+    <TextView
+    android:id="@+id/metronome_tv"
+    android:layout_width="100dp"
+    android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical" />
+
     <Button
         android:id="@+id/start_metronome"
         android:layout_width="wrap_content"
@@ -32,12 +38,8 @@
         android:id="@+id/stop_rec"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="STOPREC" />
-
-    <TextView
-    android:id="@+id/metronome_tv"
-    android:layout_width="100dp"
-    android:layout_height="wrap_content" />
+        android:text="STOPREC"
+        android:layout_gravity="bottom" />
 
 
 </LinearLayout>

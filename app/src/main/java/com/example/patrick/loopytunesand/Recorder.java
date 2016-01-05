@@ -53,14 +53,6 @@ public class Recorder {
 
 
         recorder.startRecording();
-    }
-
-    public void startRecording() {
-        Log.d("RECREADY", "STARTREC");
-
-
-        // start audio playback
-        Log.d("RECREADY", "PLAYBACK");
 
         recordingThread = new Thread(new Runnable() {
             public void run() {
@@ -68,9 +60,13 @@ public class Recorder {
                 writeAudioDataToFile();
             }
         }, "AudioRecorder Thread");
+    }
+
+    public void startRecording() {
+        Log.d("RECREADY", "STARTREC");
+        a = System.currentTimeMillis();
         recordingThread.start();
         st=System.currentTimeMillis();
-        Log.d("MINBUFFERSIZE", String.valueOf(bufferSize));
     }
 
     //convert short to byte
@@ -99,7 +95,8 @@ public class Recorder {
             e.printStackTrace();
         }
         System.out.print("STOPRECORD");
-        a = System.currentTimeMillis();
+        long b = System.currentTimeMillis() - a;
+
         while (isRecording) {
             // gets the voice output from microphone to byte format
 
@@ -111,11 +108,11 @@ public class Recorder {
             try {
                 // // writes the data to file from buffer
                 // // stores the voice buffer
+
                 byte bData[] = short2byte(sData);
 
-                long b = System.currentTimeMillis() - a;
-                Log.d("WRITEDIF", String.valueOf(b));
 
+                Log.d("WRITEDIF", String.valueOf(b));
                 os.write(bData, 0, BufferElements2Rec * BytesPerElement);
             } catch (IOException e) {
                 e.printStackTrace();

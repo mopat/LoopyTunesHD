@@ -47,6 +47,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
     private boolean button1Rec = false;
     private boolean isRecording = false;
     Context c;
+    private MediaPlayer mp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +65,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
     }
 
     private void init() {
+        mp = MediaPlayer.create(this, R.raw.click);
         m = new Metronome(bpm);
         c = getApplicationContext();
         startMetronome = (Button) findViewById(R.id.start_metronome);
@@ -150,12 +152,11 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
 
         Log.d("CLICK", "CLICK");
         this.runOnUiThread(new Runnable() {
-
-
             @Override
             public void run() {
+                mp.start();
                 // This code will always run on the UI thread, therefore is safe to modify UI elements.
-long t = System.currentTimeMillis() - dif;
+                long t = System.currentTimeMillis() - dif;
                 Log.d("dif", String.valueOf(t));
                 if (beatCount == 1) {
                     loopCount++;
@@ -179,8 +180,12 @@ long t = System.currentTimeMillis() - dif;
                 if (beatCount == 4) {
                     beatCount = 0;
                     //stopSamples();
+
+                }
+                if (beatCount == 1) {
+                    //stopSamples();
                     if (loopCount == 3) {
-                         //m.setBarTimeNano();
+                        //m.setBarTimeNano();
                     }
                     Log.d("SPLAY", "Play");
                     playSamples();
