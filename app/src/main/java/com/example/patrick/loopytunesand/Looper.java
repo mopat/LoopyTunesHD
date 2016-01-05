@@ -30,11 +30,11 @@ interface MetronomeClick {
     void metronomeClick();
 }
 
-interface NoMetronomeClick {
-    void noMetronomeClick();
+interface MetronomePreClick {
+    void metronomePreClick();
 }
 
-public class Looper extends AppCompatActivity implements MetronomeClick {
+public class Looper extends AppCompatActivity implements MetronomeClick, MetronomePreClick {
     private Button startMetronome, stopMetronome, stopRec;
     private Button sampleButtons[];
     private int bpm, beatCount, loopCount, clickedLoopCount;
@@ -78,7 +78,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick {
         metronomeThread = new Thread(m);
         metronomeThread.start();
         m.addMetronomeClickListener(this);
-
+        m.addMetronomePreClickListener(this);
      /*   new Thread(new Runnable() {
             @Override
             public void run() {
@@ -115,19 +115,13 @@ public class Looper extends AppCompatActivity implements MetronomeClick {
                 //r.startRecording();
                 clickedLoopCount = loopCount;
                 button1Rec = true;
+                r.prepareRecorder();
             }
         });
         stopRec.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                r.stopRecording();
-                addSample();
-               /* try{
-                    p.playSample(sample);
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }*/
+                r.enableRecording();
 
             }
         });
@@ -149,15 +143,20 @@ public class Looper extends AppCompatActivity implements MetronomeClick {
         Log.d("'SAMPLELENGTH", String.valueOf(m.getDuration()));
     }
 
+    long dif;
+
     @Override
     public void metronomeClick() {
-        //Log.d("CLICK", "CLICK");
+
+        Log.d("CLICK", "CLICK");
         this.runOnUiThread(new Runnable() {
+
 
             @Override
             public void run() {
                 // This code will always run on the UI thread, therefore is safe to modify UI elements.
-
+long t = System.currentTimeMillis() - dif;
+                Log.d("dif", String.valueOf(t));
                 if (beatCount == 1) {
                     loopCount++;
                 }
@@ -169,18 +168,19 @@ public class Looper extends AppCompatActivity implements MetronomeClick {
                     }
                 }
                 if (clickedLoopCount + 2 == loopCount && button1Rec) {
+                    isRecording = false;
+                    button1Rec = false;
                     r.stopRecording();
                     addSample();
                     Log.d("SPLAY", "ADD");
-                    isRecording = false;
-                    button1Rec = false;
+
                 }
                 metronomeTV.setText(String.valueOf(beatCount));
                 if (beatCount == 4) {
                     beatCount = 0;
                     //stopSamples();
                     if (loopCount == 3) {
-                        // m.setBarTimeNano();
+                         //m.setBarTimeNano();
                     }
                     Log.d("SPLAY", "Play");
                     playSamples();
@@ -216,5 +216,17 @@ public class Looper extends AppCompatActivity implements MetronomeClick {
     public void pr(String msg) {
         Log.d(msg, msg);
 
+    }
+
+    @Override
+    public void metronomePreClick() {
+/*        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                dif = System.currentTimeMillis();
+                Log.d("DIF", String.valueOf(dif));
+                Log.d("PRECLICK", "PRECLICK");
+            }
+        }).start();*/
     }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 
 public class Metronome implements Runnable {
     private List<MetronomeClick> clickListeners = new ArrayList<MetronomeClick>();
-    private List<NoMetronomeClick> noClicklisteners = new ArrayList<NoMetronomeClick>();
+    private List<MetronomePreClick> preClickListener = new ArrayList<MetronomePreClick>();
     int bpm;
     Handler handler;
     boolean running = false;
@@ -42,7 +42,7 @@ public class Metronome implements Runnable {
                 startTime = curTime;
                 click();
             }
-         
+
 
         }
     }
@@ -72,20 +72,19 @@ public class Metronome implements Runnable {
         clickListeners.add(listener);
     }
 
-    public void addMetronomenNoClickListener(NoMetronomeClick listener) {
-        noClicklisteners.add(listener);
+    public void addMetronomePreClickListener(MetronomePreClick listener) {
+        preClickListener.add(listener);
     }
 
     void click() {
         for (MetronomeClick listener : clickListeners) {
             listener.metronomeClick();
-            Log.d("BARTIME", String.valueOf(barTimeNano));
         }
     }
 
-    void noClick() {
-        for (NoMetronomeClick listener : noClicklisteners) {
-            listener.noMetronomeClick();
+    void preClick() {
+        for (MetronomePreClick listener : preClickListener) {
+            listener.metronomePreClick();
         }
     }
 }

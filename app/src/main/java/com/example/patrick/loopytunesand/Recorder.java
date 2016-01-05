@@ -27,82 +27,52 @@ public class Recorder {
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     private AudioRecord recorder = null;
     private Thread recordingThread, stopRecordingThread = null;
-    private boolean isRecording = false;
+    private boolean isRecording = false, enableRecording = false;
     private String samplePath = null;
     long recordTime, st;
     int bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
             RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 
-    int BufferElements2Rec = bufferSize/2; // want to play 2048 (2K) since 2 bytes we use only 1024
+    int BufferElements2Rec = bufferSize / 2; // want to play 2048 (2K) since 2 bytes we use only 1024
     int BytesPerElement = 2; // 2 bytes in 16bit format
+    long a;
+    File sample;
 
-    public void startRecording() {
-       System.out.print("STARTRECORD");
+    public void prepareRecorder() {
+        System.out.print("STARTRECORD");
 
+        try {
+            sample = File.createTempFile("smp", ".pcm", Absolutes.DIRECTORY);
+        } catch (IOException e) {
+            Log.e("ERROR", "sdcard access error");
+            return;
+        }
         recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                 RECORDER_SAMPLERATE, RECORDER_CHANNELS,
                 RECORDER_AUDIO_ENCODING, BufferElements2Rec * BytesPerElement);
 
+
         recorder.startRecording();
-        isRecording = true;
+    }
+
+    public void startRecording() {
+        Log.d("RECREADY", "STARTREC");
+
+
+        // start audio playback
+        Log.d("RECREADY", "PLAYBACK");
+
         recordingThread = new Thread(new Runnable() {
             public void run() {
+                isRecording = true;
                 writeAudioDataToFile();
             }
         }, "AudioRecorder Thread");
         recordingThread.start();
-        st = System.currentTimeMillis();
+        st=System.currentTimeMillis();
         Log.d("MINBUFFERSIZE", String.valueOf(bufferSize));
-
-
-
-    }
-    Thread th;
-    AudioTrack at;
-    boolean m_isRun=true;
-    public void loopback() {
-        // Prepare the AudioRecord & AudioTrack
-        try {
-
-            if (bufferSize <= 3584) {
-                bufferSize = 3584;
-            }
-            Log.i("TAG","Initializing Audio Record and Audio Playing objects");
-
-            recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                    RECORDER_SAMPLERATE, AudioFormat.CHANNEL_IN_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT, bufferSize * 1);
-
-            at = new AudioTrack(AudioManager.STREAM_ALARM,
-                    RECORDER_SAMPLERATE, AudioFormat.CHANNEL_CONFIGURATION_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT, bufferSize * 1,
-                    AudioTrack.MODE_STREAM);
-
-            at.setPlaybackRate(RECORDER_SAMPLERATE);
-        } catch (Throwable t) {
-            Log.e("Error", "Initializing Audio Record and Play objects Failed "+t.getLocalizedMessage());
-        }
-
-        recorder.startRecording();
-        Log.i("YO","Audio Recording started");
-        at.play();
-        Log.i("HEY","Audio Playing started");
-        byte sData[] = new byte[BufferElements2Rec];
-        while (m_isRun) {
-            recorder.read(sData, 0, 3584);
-            at.write(sData, 0, bufferSize * BytesPerElement);
-        }
-
-        Log.i("EXIT", "loopback exit");
     }
 
-    private void do_loopback() {
-        th = new Thread(new Runnable() {
-            public void run() {
-                loopback();
-            }
-        });
-    }
     //convert short to byte
     private byte[] short2byte(short[] sData) {
         int shortArrsize = sData.length;
@@ -118,13 +88,7 @@ public class Recorder {
 
     private void writeAudioDataToFile() {
         // Write the output audio in byte
-        File sample;
-        try {
-            sample = File.createTempFile("smp", ".pcm", Absolutes.DIRECTORY);
-        } catch (IOException e) {
-            Log.e("ERROR", "sdcard access error");
-            return;
-        }
+
         samplePath = sample.getAbsolutePath();
         short sData[] = new short[BufferElements2Rec];
 
@@ -135,15 +99,23 @@ public class Recorder {
             e.printStackTrace();
         }
         System.out.print("STOPRECORD");
+        a = System.currentTimeMillis();
         while (isRecording) {
             // gets the voice output from microphone to byte format
 
+            Log.d("ENABLED", String.valueOf(enableRecording));
+
             recorder.read(sData, 0, BufferElements2Rec);
+
             //System.out.println("Short wirting to file" + sData.toString());
             try {
                 // // writes the data to file from buffer
                 // // stores the voice buffer
                 byte bData[] = short2byte(sData);
+
+                long b = System.currentTimeMillis() - a;
+                Log.d("WRITEDIF", String.valueOf(b));
+
                 os.write(bData, 0, BufferElements2Rec * BytesPerElement);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -153,6 +125,7 @@ public class Recorder {
             os.close();
         } catch (IOException e) {
             e.printStackTrace();
+
         }
     }
 
@@ -167,12 +140,21 @@ public class Recorder {
                     recorder.release();
                     recorder = null;
                     recordingThread = null;
+                    enableRecording = false;
                 }
                 recordTime = System.currentTimeMillis() - st;
                 Log.d("RECORDTIME", String.valueOf(recordTime));
             }
         });
         stopRecordingThread.start();
+    }
+
+    public void enableRecording() {
+        enableRecording = true;
+    }
+
+    public void disableRecoding() {
+        enableRecording = false;
     }
 
 

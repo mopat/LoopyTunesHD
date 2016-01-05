@@ -187,7 +187,7 @@ public class Player {
                         return;
                     }
 
-                    int count = 4096; // 512 kb
+                    int count = 512; // 512 kb
 //Reading the file..
                     byte[] byteData = null;
                     File file = null;
@@ -217,7 +217,7 @@ public class Player {
                             at.play();
                             at.write(byteData, 0, ret);
 
-                            Log.d("BYTESREAD", String.valueOf(bytesread));
+                          //  Log.d("BYTESREAD", String.valueOf(bytesread));
                             bytesread += ret;
                         } else break;
                     }
