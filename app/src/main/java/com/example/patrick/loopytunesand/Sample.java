@@ -38,9 +38,10 @@ public class Sample {
                 e.printStackTrace();
             }
 // Set and push to audio track..
-            int bufferSize = android.media.AudioTrack.getMinBufferSize(44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT);
-            AudioTrack at = new AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
+            int bufferSize = android.media.AudioTrack.getMinBufferSize(44100, AudioFormat.CHANNEL_OUT_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT)/2;
+            Log.d("BUFFERSIZE1", String.valueOf(bufferSize));
+            AudioTrack at = new AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_OUT_MONO,
                     AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
             this.at = at;
             this.byteData = byteData;
@@ -50,7 +51,7 @@ public class Sample {
     }
 
     public AudioTrack getSampleAt() {
-        return at;
+        at.setPlaybackHeadPosition(0); return at;
     }
 
     public byte[] getByteData() {

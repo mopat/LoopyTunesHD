@@ -33,11 +33,11 @@ public class Recorder {
     int bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
             RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 
-    int BufferElements2Rec = 1024; // want to play 2048 (2K) since 2 bytes we use only 1024
+    int BufferElements2Rec = bufferSize/2; // want to play 2048 (2K) since 2 bytes we use only 1024
     int BytesPerElement = 2; // 2 bytes in 16bit format
 
     public void startRecording() {
-        System.out.print("STARTRECORD");
+       System.out.print("STARTRECORD");
 
         recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                 RECORDER_SAMPLERATE, RECORDER_CHANNELS,
@@ -52,8 +52,57 @@ public class Recorder {
         }, "AudioRecorder Thread");
         recordingThread.start();
         st = System.currentTimeMillis();
+        Log.d("MINBUFFERSIZE", String.valueOf(bufferSize));
+
+
+
+    }
+    Thread th;
+    AudioTrack at;
+    boolean m_isRun=true;
+    public void loopback() {
+        // Prepare the AudioRecord & AudioTrack
+        try {
+
+            if (bufferSize <= 3584) {
+                bufferSize = 3584;
+            }
+            Log.i("TAG","Initializing Audio Record and Audio Playing objects");
+
+            recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
+                    RECORDER_SAMPLERATE, AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT, bufferSize * 1);
+
+            at = new AudioTrack(AudioManager.STREAM_ALARM,
+                    RECORDER_SAMPLERATE, AudioFormat.CHANNEL_CONFIGURATION_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT, bufferSize * 1,
+                    AudioTrack.MODE_STREAM);
+
+            at.setPlaybackRate(RECORDER_SAMPLERATE);
+        } catch (Throwable t) {
+            Log.e("Error", "Initializing Audio Record and Play objects Failed "+t.getLocalizedMessage());
+        }
+
+        recorder.startRecording();
+        Log.i("YO","Audio Recording started");
+        at.play();
+        Log.i("HEY","Audio Playing started");
+        byte sData[] = new byte[BufferElements2Rec];
+        while (m_isRun) {
+            recorder.read(sData, 0, 3584);
+            at.write(sData, 0, bufferSize * BytesPerElement);
+        }
+
+        Log.i("EXIT", "loopback exit");
     }
 
+    private void do_loopback() {
+        th = new Thread(new Runnable() {
+            public void run() {
+                loopback();
+            }
+        });
+    }
     //convert short to byte
     private byte[] short2byte(short[] sData) {
         int shortArrsize = sData.length;
