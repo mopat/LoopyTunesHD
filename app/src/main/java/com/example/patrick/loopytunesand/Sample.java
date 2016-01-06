@@ -51,7 +51,7 @@ public class Sample {
     }
 
     public AudioTrack getSampleAt() {
-        at.setPlaybackHeadPosition(0); return at;
+        return at;
     }
 
     public byte[] getByteData() {

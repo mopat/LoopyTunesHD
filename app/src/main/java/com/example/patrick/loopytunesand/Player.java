@@ -198,11 +198,16 @@ public class Player {
                     try {
                         in = new FileInputStream(file);
 
+
                     } catch (FileNotFoundException e) {
 // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-
+                    try {
+                        in.skip(32100);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     int bytesread = 0, ret = 0;
                     int size = (int) file.length();
                     Log.d("FILELENGTH", String.valueOf(size));
@@ -210,14 +215,14 @@ public class Player {
                     while (bytesread <= size) {
                         try {
                             ret = in.read(byteData, 0, count);
+                           // Log.d("BYTESREAD", String.valueOf(ret));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                         if (ret != -1) { // Write the byte array to the track
                             at.play();
-                            at.write(byteData, 0, ret);
+                            at.write(byteData, 0, count);
 
-                            //  Log.d("BYTESREAD", String.valueOf(bytesread));
                             bytesread += ret;
                         } else break;
                     }

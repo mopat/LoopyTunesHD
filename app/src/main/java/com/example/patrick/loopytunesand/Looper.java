@@ -1,27 +1,14 @@
 package com.example.patrick.loopytunesand;
 
-import android.animation.ArgbEvaluator;
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.media.AudioManager;
-import android.media.AudioTrack;
 import android.media.MediaPlayer;
-import android.media.SoundPool;
-import android.os.Environment;
-import android.provider.Settings;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import java.io.File;
-import java.io.IOException;
-
-import android.net.Uri;
 
 import java.util.ArrayList;
 
@@ -149,12 +136,19 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
 
     @Override
     public void metronomeClick() {
-
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if(mp.isPlaying())
+                mp.stop();
+                mp.start();
+            }
+        }).start();
         Log.d("CLICK", "CLICK");
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mp.start();
+
                 // This code will always run on the UI thread, therefore is safe to modify UI elements.
                 long t = System.currentTimeMillis() - dif;
                 Log.d("dif", String.valueOf(t));
@@ -184,9 +178,6 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
                 }
                 if (beatCount == 1) {
                     //stopSamples();
-                    if (loopCount == 3) {
-                        //m.setBarTimeNano();
-                    }
                     Log.d("SPLAY", "Play");
                     playSamples();
 
