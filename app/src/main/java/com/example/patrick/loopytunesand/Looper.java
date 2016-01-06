@@ -171,13 +171,17 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
 
                 }
                 metronomeTV.setText(String.valueOf(beatCount));
-                if (beatCount == 4) {
+                if (beatCount == 4 ) {
                     beatCount = 0;
                     //stopSamples();
 
                 }
+
+                if (beatCount == 1 && samples.size() > 0 ) {
+                    stopSamples();
+
+                }
                 if (beatCount == 1) {
-                    //stopSamples();
                     Log.d("SPLAY", "Play");
                     playSamples();
 

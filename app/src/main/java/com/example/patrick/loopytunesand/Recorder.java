@@ -118,12 +118,7 @@ public class Recorder {
                 e.printStackTrace();
             }
         }
-        try {
-            os.close();
-        } catch (IOException e) {
-            e.printStackTrace();
 
-        }
     }
 
     public void stopRecording() {
@@ -137,10 +132,10 @@ public class Recorder {
                     recorder.release();
                     recorder = null;
                     recordingThread = null;
-                    enableRecording = false;
                 }
                 recordTime = System.currentTimeMillis() - st;
                 Log.d("RECORDTIME", String.valueOf(recordTime));
+                stopRecordingThread = null;
             }
         });
         stopRecordingThread.start();

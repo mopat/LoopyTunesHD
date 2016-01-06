@@ -204,7 +204,7 @@ public class Player {
                         e.printStackTrace();
                     }
                     try {
-                        in.skip(32100);
+                        in.skip(5820);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
