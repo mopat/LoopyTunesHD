@@ -33,14 +33,16 @@ public class LatencyMetronome implements Runnable {
         }
 
     }
+
     int i = 0;
+
     private void runAudioLatencyMetronome() {
         long startTime1 = System.currentTimeMillis();
         long startTime2 = System.currentTimeMillis();
         long a = 0;
-        long b= 0;
+        long b = 0;
         while (running) {
-            if (i > 0) {
+            if (i > 3) {
                 long curTime = System.currentTimeMillis();
                 if (curTime - startTime1 >= barTimeNano) {
                     //Log.d("TIMECUR", String.valueOf(curTime - startTime));
@@ -52,22 +54,22 @@ public class LatencyMetronome implements Runnable {
                 }
             }
 
-            if (i == 0) {
+            if (i <= 3) {
                 long curTime = System.currentTimeMillis();
-                if (curTime - startTime2 >= barTimeNano) {
+                if (curTime - startTime2 >= barTimeNano - 93) {
                     //Log.d("TIMECUR", String.valueOf(curTime - startTime));
                     //Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
                     startTime2 = curTime;
                     startTime1 = System.currentTimeMillis();
-                    preClick();   i++;
+                    preClick();
+                    i++;
                     //Log.d("METRODIF", String.valueOf(startTime2));
-                     //Log.d("METROZERO", String.valueOf(System.currentTimeMillis()));
+                    //Log.d("METROZERO", String.valueOf(System.currentTimeMillis()));
                 }
             }
 
         }
     }
-
 
 
     public void startMetronome() {

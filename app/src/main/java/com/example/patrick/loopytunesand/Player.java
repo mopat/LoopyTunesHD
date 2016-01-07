@@ -202,7 +202,7 @@ public class Player {
 // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-                    int skip = 32352;
+                    int skip = 32876;
                    /*     if(beatcount == 1)
                             skip = 0;
                         if(beatcount == 2)
@@ -214,7 +214,7 @@ public class Player {
 
                     try {
                         //in.skip(7880);
-                        in.skip(0);
+                        in.skip(skip);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

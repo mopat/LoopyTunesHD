@@ -180,13 +180,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
                     addSample();
 
                 }
-                if (beatCount == 1) {
-                    Log.d("SPLAY", "Play");
-                    stopSamples();
-                    playSamples();
-                    Log.d("METROONE", String.valueOf(System.currentTimeMillis()));
 
-                }
                if (button1Rec && beatCount == 1) {
                    // if (!isRecording) {
                         //Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
@@ -244,18 +238,16 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
                 if (beatCount2 == 1) {
                     loopCount2++;
                 }
-
-                //pr("METROCLICK", String.valueOf(System.currentTimeMillis() - kif));
-
-                Log.d("COUNTBEAT", String.valueOf(beatCount2));
-                Log.d("COUNTLOOP", String.valueOf(2));
                 if (beatCount2 == 1) {
                     Log.d("SPLAY", "Play");
                     stopSamples();
                     playSamples();
-                    //Log.d("METROONE", String.valueOf(System.currentTimeMillis()));
+                    Log.d("METROONE", String.valueOf(System.currentTimeMillis()));
 
                 }
+                //pr("METROCLICK", String.valueOf(System.currentTimeMillis() - kif));
+
+                Log.d("COUNTBEAT", String.valueOf(beatCount2));
                 if (button1Rec && beatCount2 == 1) {
                     if (!isRecording) {
                         //Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
