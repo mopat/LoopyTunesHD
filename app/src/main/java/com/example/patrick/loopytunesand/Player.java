@@ -181,7 +181,6 @@ public class Player {
                     final AudioTrack at = new AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_OUT_MONO,
                             AudioFormat.ENCODING_PCM_16BIT, intSize, AudioTrack.MODE_STREAM);
 
-
                     if (at == null) {
                         Log.d("TCAudio", "audio track is not initialised ");
                         return;
@@ -203,7 +202,7 @@ public class Player {
 // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-int skip = 32876;
+                    int skip = 32876;
                    /*     if(beatcount == 1)
                             skip = 0;
                         if(beatcount == 2)
@@ -215,7 +214,7 @@ int skip = 32876;
 
                     try {
                         //in.skip(7880);
-                        in.skip(skip);
+                        in.skip(0);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

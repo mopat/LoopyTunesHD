@@ -13,7 +13,6 @@ import java.util.List;
 
 public class Metronome implements Runnable {
     private List<MetronomeClick> clickListeners = new ArrayList<MetronomeClick>();
-    private List<MetronomePreClick> preClickListener = new ArrayList<MetronomePreClick>();
     int bpm;
     Handler handler;
     boolean running = false;
@@ -39,10 +38,11 @@ public class Metronome implements Runnable {
         while (running) {
             long curTime = System.currentTimeMillis();
             if (curTime - startTime >= barTimeNano) {
-                Log.d("TIMECUR", String.valueOf(curTime-startTime));
+                // Log.d("TIMECUR", String.valueOf(curTime - startTime));
                 //Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
                 startTime = curTime;
                 click();
+                Log.d("METRONORMAL", String.valueOf(System.currentTimeMillis()));
             }
 
 
@@ -74,9 +74,6 @@ public class Metronome implements Runnable {
         clickListeners.add(listener);
     }
 
-    public void addMetronomePreClickListener(MetronomePreClick listener) {
-        preClickListener.add(listener);
-    }
 
     void click() {
         for (MetronomeClick listener : clickListeners) {
@@ -84,9 +81,4 @@ public class Metronome implements Runnable {
         }
     }
 
-    void preClick() {
-        for (MetronomePreClick listener : preClickListener) {
-            listener.metronomePreClick();
-        }
-    }
 }

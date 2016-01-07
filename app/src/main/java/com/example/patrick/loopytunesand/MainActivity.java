@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
         init();
         initListeners();
-        bpm.setText("40");
+        bpm.setText("80");
     }
 
     private void init() {
