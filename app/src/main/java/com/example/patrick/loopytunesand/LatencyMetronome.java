@@ -54,7 +54,7 @@ public class LatencyMetronome implements Runnable {
 
             if (i == 0) {
                 long curTime = System.currentTimeMillis();
-                if (curTime - startTime2 >= barTimeNano ) {
+                if (curTime - startTime2 >= barTimeNano) {
                     //Log.d("TIMECUR", String.valueOf(curTime - startTime));
                     //Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
                     startTime2 = curTime;
@@ -89,7 +89,7 @@ public class LatencyMetronome implements Runnable {
 
     private void bpmToNano() {
         long barTimeInMs = 60000 / bpm;
-        barTimeNano = barTimeInMs*4;
+        barTimeNano = barTimeInMs;
     }
 
 
