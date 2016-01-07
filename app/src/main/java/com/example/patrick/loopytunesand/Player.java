@@ -26,6 +26,8 @@ public class Player {
     Thread stopThread, playThread, th, tp;
     long lag, st;
     Context context;
+    int intSize = android.media.AudioTrack.getMinBufferSize(44100, AudioFormat.CHANNEL_OUT_MONO,
+            AudioFormat.ENCODING_PCM_16BIT);
 
     public Player(Context context) {
         this.context = context;
@@ -53,7 +55,7 @@ public class Player {
     }
 
 
-    public void playSamples(final ArrayList<Sample> samples) {
+    public void playSamples(final ArrayList<Sample> samples, final int beatcount) {
 
         for (int i = 0; i < samples.size(); i++) {
             final Sample sample = samples.get(i);
@@ -175,8 +177,6 @@ public class Player {
                     if (sample.filePath() == null)
                         return;
 
-                    int intSize = android.media.AudioTrack.getMinBufferSize(44100, AudioFormat.CHANNEL_OUT_MONO,
-                            AudioFormat.ENCODING_PCM_16BIT);
 
                     final AudioTrack at = new AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_OUT_MONO,
                             AudioFormat.ENCODING_PCM_16BIT, intSize, AudioTrack.MODE_STREAM);
@@ -187,7 +187,7 @@ public class Player {
                         return;
                     }
 
-                    int count = 512; // 512 kb
+                    int count = 5292; // 512 kb
 //Reading the file..
                     byte[] byteData = null;
                     File file = null;
@@ -203,28 +203,54 @@ public class Player {
 // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
+int skip = 32876;
+                   /*     if(beatcount == 1)
+                            skip = 0;
+                        if(beatcount == 2)
+                            skip = 70784;
+                        if(beatcount == 3)
+                            skip = 70784*2;
+                        if(beatcount == 4)
+                            skip = 70784*3;*/
+
                     try {
-                        in.skip(5820);
+                        //in.skip(7880);
+                        in.skip(skip);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+
                     int bytesread = 0, ret = 0;
                     int size = (int) file.length();
                     Log.d("FILELENGTH", String.valueOf(size));
-
+                    long a = 1;
+                    int i = 0;
                     while (bytesread <= size) {
+                        if (i == 0)
+                            a = System.currentTimeMillis();
+                        i++;
                         try {
                             ret = in.read(byteData, 0, count);
-                           // Log.d("BYTESREAD", String.valueOf(ret));
+                            // Log.d("BYTESREAD", String.valueOf(ret));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                         if (ret != -1) { // Write the byte array to the track
-                            at.play();
-                            at.write(byteData, 0, count);
 
+                            Long g = System.currentTimeMillis();
+                            // Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
+                            at.write(byteData, 0, count);
+                            at.play();
+                            if (i == 0)
+                                Log.d("PLAY1", String.valueOf(System.currentTimeMillis()));
+                            if (i == 1)
+                                Log.d("PLAY2", String.valueOf(System.currentTimeMillis()));
                             bytesread += ret;
-                        } else break;
+                        } else {
+                            long d = System.currentTimeMillis() - a;
+                            Log.d("SKIPPING", String.valueOf(d));
+                            break;
+                        }
                     }
                     try {
                         in.close();

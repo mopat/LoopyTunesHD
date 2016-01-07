@@ -35,6 +35,8 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
     private boolean isRecording = false;
     Context c;
     private MediaPlayer mp;
+    private ArrayList<Sample> clickList = new ArrayList<>();
+    private Sample clickSample;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,8 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
         mp = MediaPlayer.create(this, R.raw.click);
         m = new Metronome(bpm);
         c = getApplicationContext();
+        clickSample = new Sample(Absolutes.DIRECTORY + "/click.pcm");
+        clickList.add(clickSample);
         startMetronome = (Button) findViewById(R.id.start_metronome);
         stopMetronome = (Button) findViewById(R.id.stop_metronome);
         metronomeTV = (TextView) findViewById(R.id.metronome_tv);
@@ -136,15 +140,16 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
 
     @Override
     public void metronomeClick() {
-        new Thread(new Runnable() {
+       /* new Thread(new Runnable() {
             @Override
             public void run() {
                 if(mp.isPlaying())
                 mp.stop();
                 mp.start();
             }
-        }).start();
+        }).start();*/
         Log.d("CLICK", "CLICK");
+
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -157,6 +162,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
                 }
                 if (clickedLoopCount + 1 == loopCount && button1Rec) {
                     if (!isRecording) {
+                        //Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
                         r.startRecording();
                         isRecording = true;
                         Log.d("RECORD", "RECORD");
@@ -165,19 +171,20 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
                 if (clickedLoopCount + 2 == loopCount && button1Rec) {
                     isRecording = false;
                     button1Rec = false;
+                    //Log.d("ClickTriggeredB", String.valueOf(System.currentTimeMillis()));
                     r.stopRecording();
                     addSample();
                     Log.d("SPLAY", "ADD");
 
                 }
                 metronomeTV.setText(String.valueOf(beatCount));
-                if (beatCount == 4 ) {
+                if (beatCount == 4) {
                     beatCount = 0;
                     //stopSamples();
 
                 }
 
-                if (beatCount == 1 && samples.size() > 0 ) {
+                if (beatCount == 1 && samples.size() > 0) {
                     stopSamples();
 
                 }
@@ -208,7 +215,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
             at.setLoopPoints( 0, samples.get(0).getBufferSize(), -1 );
 */
 
-        p.playSamples(samples);
+        p.playSamples(samples, beatCount);
 
 
     }

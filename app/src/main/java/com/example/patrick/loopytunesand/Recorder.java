@@ -94,7 +94,7 @@ public class Recorder {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        System.out.print("STOPRECORD");
+
         long b = System.currentTimeMillis() - a;
 
         while (isRecording) {
@@ -114,6 +114,7 @@ public class Recorder {
 
                 Log.d("WRITEDIF", String.valueOf(b));
                 os.write(bData, 0, BufferElements2Rec * BytesPerElement);
+                //Log.d("ClickTriggeredB", String.valueOf(System.currentTimeMillis()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
