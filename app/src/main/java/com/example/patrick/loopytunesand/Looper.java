@@ -156,9 +156,22 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
                 // This code will always run on the UI thread, therefore is safe to modify UI elements.
 
                 metronomeTV.setText(String.valueOf(beatCount2));
+                if (clickedLoopCount + 2 == loopCount && button1Rec) {
+                    isRecording = false;
+                    button1Rec = false;
+                    //Log.d("ClickTriggeredB", String.valueOf(System.currentTimeMillis()));
+                    r.stopRecording();
+                    addSample();
+                    Log.d("SPLAY", "ADD");
+
+                }
                 if (beatCount2 == 4) {
                     beatCount2 = 0;
                     //stopSamples();
+
+                }  if (beatCount2 == 1) {
+                    Log.d("SPLAY", "Play");
+                    playSamples();
 
                 }
 
@@ -210,11 +223,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
                 if (beatCount == 1) {
                     loopCount++;
                 }
-                if (beatCount == 1) {
-                    Log.d("SPLAY", "Play");
-                    playSamples();
 
-                }
                 Log.d("BEATCOUNT", String.valueOf(beatCount));
                 if (clickedLoopCount + 1 == loopCount && button1Rec) {
                     if (!isRecording) {
@@ -224,15 +233,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
                         Log.d("RECORD", "RECORD");
                     }
                 }
-                if (clickedLoopCount + 2 == loopCount && button1Rec) {
-                    isRecording = false;
-                    button1Rec = false;
-                    //Log.d("ClickTriggeredB", String.valueOf(System.currentTimeMillis()));
-                    r.stopRecording();
-                    addSample();
-                    Log.d("SPLAY", "ADD");
 
-                }
                 if(beatCount == 4)
                     beatCount = 0;
                 beatCount++;
