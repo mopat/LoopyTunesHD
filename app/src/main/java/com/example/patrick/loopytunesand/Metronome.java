@@ -42,7 +42,7 @@ public class Metronome implements Runnable {
                 //Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
                 startTime = curTime;
                 click();
-                Log.d("METRONORMAL", String.valueOf(System.currentTimeMillis()));
+               // Log.d("METRONORMAL", String.valueOf(System.currentTimeMillis()));
             }
 
 

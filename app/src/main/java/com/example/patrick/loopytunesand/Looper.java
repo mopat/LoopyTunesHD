@@ -65,7 +65,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
         stopMetronome = (Button) findViewById(R.id.stop_metronome);
         metronomeTV = (TextView) findViewById(R.id.metronome_tv);
         stopRec = (Button) findViewById(R.id.stop_rec);
-        beatCount = 1;
+        beatCount = 0;
         loopCount = 0;
         r = new Recorder();
         p = new Player(c);
@@ -144,48 +144,53 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
 
     long dif;
     int beatCount2 = 1;
+    int kif = 0;
+
     @Override
     public void metronomeClick() {
-        Log.d("CLICK", "CLICK");
+        //Log.d("CLICK", "CLICK");
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(mp.isPlaying())
+                if (mp.isPlaying())
                     mp.stop();
-                mp.start();
+                //  mp.start();
+                beatCount++;
                 // This code will always run on the UI thread, therefore is safe to modify UI elements.
+                if (beatCount == 1) {
+                    loopCount++;
+                }
 
-                metronomeTV.setText(String.valueOf(beatCount2));
+
+                metronomeTV.setText(String.valueOf(beatCount));
+                Log.d("COUNTCLICKED", String.valueOf(clickedLoopCount+2));
+                Log.d("COUNTLOOP", String.valueOf(loopCount));
                 if (clickedLoopCount + 2 == loopCount && button1Rec) {
                     isRecording = false;
                     button1Rec = false;
                     //Log.d("ClickTriggeredB", String.valueOf(System.currentTimeMillis()));
                     r.stopRecording();
+                    Log.d("COUNTRECORDINGSTOP", String.valueOf(System.currentTimeMillis()));
+                    Log.d("RECORDINGSTOP", String.valueOf(System.currentTimeMillis()));
                     addSample();
-                    Log.d("SPLAY", "ADD");
 
                 }
-                if (beatCount2 == 4) {
-                    beatCount2 = 0;
-                    //stopSamples();
-
-                }  if (beatCount2 == 1) {
+                if (beatCount == 4) {
                     Log.d("SPLAY", "Play");
+                    stopSamples();
                     playSamples();
+                    Log.d("METROONE", String.valueOf(System.currentTimeMillis()));
 
                 }
-
-                /*if (beatCount == 1 && samples.size() > 0) {
-                    stopSamples();
-
-                }*/
+                if (beatCount == 4)
+                    beatCount = 0;
 
             /*    System.out.println(button1Rec);
                 System.out.println(beatCount);
                 System.out.println(loopCount);*/
 
 
-                beatCount2++;
+
             }
         });
 
@@ -215,29 +220,21 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
     @Override
     public void metronomePreClick() {
         //Log.d("METROLATENCY", String.valueOf(System.currentTimeMillis()));
-        this.runOnUiThread(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 long t = System.currentTimeMillis() - dif;
                 Log.d("dif", String.valueOf(t));
-                if (beatCount == 1) {
-                    loopCount++;
-                }
-
-                Log.d("BEATCOUNT", String.valueOf(beatCount));
-                if (clickedLoopCount + 1 == loopCount && button1Rec) {
+                Log.d("METROZERO", String.valueOf(System.currentTimeMillis()));
+                if (button1Rec) {
                     if (!isRecording) {
                         //Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
                         r.startRecording();
+                        Log.d("RECORDINGSTART", String.valueOf(System.currentTimeMillis()));
                         isRecording = true;
-                        Log.d("RECORD", "RECORD");
                     }
                 }
-
-                if(beatCount == 4)
-                    beatCount = 0;
-                beatCount++;
             }
-        });
+        }).start();
     }
 }
