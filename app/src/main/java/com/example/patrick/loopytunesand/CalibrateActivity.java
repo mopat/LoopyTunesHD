@@ -5,6 +5,7 @@ import android.media.audiofx.Visualizer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
@@ -21,7 +22,7 @@ public class CalibrateActivity extends AppCompatActivity implements PlayerUpdate
     MediaPlayer mp;
     private Button calibrateButton, testCalibrationButton;
     private VisualizerView visualizerViewOutput, visualizerViewInput;
-    private Visualizer outputVisualizer, inputVisualizer;
+    private Visualizer outputVisualizer, inputVisualizer, outputMixVisulaizer;
     List<Byte> bytesList = new ArrayList<Byte>();
     private Recorder r;
     private Player player;
@@ -34,6 +35,7 @@ public class CalibrateActivity extends AppCompatActivity implements PlayerUpdate
 
         init();
         initListeners();
+        initOutputVisualizer();
     }
 
     private void init() {
@@ -42,9 +44,40 @@ public class CalibrateActivity extends AppCompatActivity implements PlayerUpdate
         r = new Recorder();
         player.addUpdateListener(this);
         calibrateButton = (Button) findViewById(R.id.start_calibration_button);
-        testCalibrationButton = (Button)findViewById(R.id.test_calibration_button);
+        testCalibrationButton = (Button) findViewById(R.id.test_calibration_button);
         visualizerViewOutput = (VisualizerView) findViewById(R.id.output_visualizer);
         visualizerViewInput = (VisualizerView) findViewById(R.id.input_visualizer);
+    }
+    ArrayList<Byte> byties = new ArrayList<>();
+
+    private byte[] outputtedBytes;
+    private void initOutputVisualizer() {
+
+        outputMixVisulaizer = new Visualizer(0);
+        outputMixVisulaizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
+        outputMixVisulaizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
+            public void onWaveFormDataCapture(Visualizer visualizer, byte[] bytes,
+                                              int samplingRate) {
+                //visualizerViewOutput.updateVisualizer(bytes); // this is the where you put the pcm routine
+                //visualizerViewOutput.setEnabled(false);
+                //outputMixVisulaizer.setEnabled(false);
+                for (Byte b : bytes)
+                    byties.add(b);
+            }
+
+            public void onFftDataCapture(Visualizer visualizer, byte[] bytes, int samplingRate) {
+            }
+        }, Visualizer.getMaxCaptureRate() / 2, true, false);
+
+    }
+
+
+    private byte[] listToByte(ArrayList<Byte> bytes){
+        byte[] bytes1 = new byte[bytes.size()];
+        for(int i = 0; i < bytes.size(); i++){
+            bytes1[i] = bytes.get(i);
+        }
+        return bytes1;
     }
 
     private void initListeners() {
@@ -52,41 +85,69 @@ public class CalibrateActivity extends AppCompatActivity implements PlayerUpdate
         Sample s = new Sample(clickFilePath);
 
         samples.add(s);
-        r.prepareRecorder();
-        calibrateButton.setOnClickListener(new View.OnClickListener() {
+        calibrateButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    if (samples.size() > 1)
+                        samples.remove(1);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            player.playSamples(samples, 0);
+                            outputMixVisulaizer.setEnabled(true);
+                        }
+                    }).start();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            r.prepareRecorder();
+                            r.startRecording();
+                        }
+                    }).start();
+                }
+                return false;
+            }
+        });
+/*        calibrateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //setupVisualization();
 
 
-           /*     try {
+           *//*     try {
                     Thread.sleep(600);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                }*/
+                }*//*
 
                 if (samples.size() > 1)
                     samples.remove(1);
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        player.playSamples(samples, 0);                  }
+                        player.playSamples(samples, 0);
+                        outputMixVisulaizer.setEnabled(true);
+                    }
                 }).start();
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        r.prepareRecorder();
                         r.startRecording();
                     }
                 }).start();
             }
-        });
+        });*/
         testCalibrationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                r.prepareRecorder();
                 player.stopSample(samples);
                 player.playSamples(samples, 0);
             }
         });
+
     }
 
     @Override
@@ -96,14 +157,16 @@ public class CalibrateActivity extends AppCompatActivity implements PlayerUpdate
             public void run() {
                 Log.d("BYTIES", String.valueOf(playedBytes.length));
                 r.stopRecording();
+                outputtedBytes = listToByte(byties);
+                visualizerViewOutput.updateVisualizer(outputtedBytes);
 
-                visualizerViewOutput.updateVisualizer(playedBytes);
+                //visualizerViewOutput.updateVisualizer(playedBytes);
                 File f = new File(r.getSamplePath());
 
                 byte[] byteArray = readContentIntoByteArray(f);
                 FileOutputStream fos = null;
                 try {
-                    fos = new FileOutputStream(Absolutes.DIRECTORY+"/recordedsample.pcm");
+                    fos = new FileOutputStream(Absolutes.DIRECTORY + "/recordedsample.pcm");
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -118,30 +181,31 @@ public class CalibrateActivity extends AppCompatActivity implements PlayerUpdate
                     e.printStackTrace();
                 }
 
-                recordedSample = new Sample(Absolutes.DIRECTORY+"/recordedsample.pcm");
-                samples.add(recordedSample);
-                visualizerViewInput.updateVisualizer(byteArray);
+                if (samples.size() == 1) {
+                    recordedSample = new Sample(Absolutes.DIRECTORY + "/recordedsample.pcm");
+                    samples.add(recordedSample);
+                    visualizerViewInput.updateVisualizer(byteArray);
+                }
+
             }
         });
 
     }
+
     Sample recordedSample;
-    private static byte[] readContentIntoByteArray(File file)
-    {
+
+    private static byte[] readContentIntoByteArray(File file) {
         FileInputStream fileInputStream = null;
         byte[] bFile = new byte[(int) file.length()];
-        int toCut = 32876;
-        byte[] cut = new byte[(int)file.length()-toCut];
-        try
-        {
+        int toCut = 0;
+        byte[] cut = new byte[(int) file.length() - toCut];
+        try {
             //convert file into array of bytes
             fileInputStream = new FileInputStream(file);
             fileInputStream.read(bFile);
             fileInputStream.close();
 
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         System.arraycopy(bFile, toCut, cut, 0, cut.length);
@@ -149,8 +213,6 @@ public class CalibrateActivity extends AppCompatActivity implements PlayerUpdate
     }
 
     private void setupVisualizerFxAndUI(byte[] playedBytes) {
-
-
 
 
         // Create the Visualizer object and attach it to our media player.

@@ -62,7 +62,7 @@ public class VisualizerView extends View {
         }
         mRect.set(0, 0, getWidth(), getHeight());
         for (int i = 0; i < mBytes.length - 1; i++) {
-            if (mBytes[i] < -110 || mBytes[i] > 110) {
+
                 //Log.d("MBYTES", String.valueOf(mBytes[i]));
                 mPoints[i * 4] = mRect.width() * i / (mBytes.length - 1);
                 mPoints[i * 4 + 1] = mRect.height() / heightDiv
@@ -71,12 +71,8 @@ public class VisualizerView extends View {
                 mPoints[i * 4 + 3] = mRect.height() / heightDiv
                         + ((byte) (mBytes[i + 1] + resolution)) * (mRect.height() / heightDiv)
                         / resolution;
-            } else {
-                mPoints[i * 4] = 1;
-                mPoints[i * 4 + 1] = 1;
-                mPoints[i * 4 + 2] = 1;
-                mPoints[i * 4 + 3] = 1;
-            }
+
+
 
         }
         canvas.drawLines(mPoints, mForePaint);
