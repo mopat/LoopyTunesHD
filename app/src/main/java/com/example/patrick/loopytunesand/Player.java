@@ -14,9 +14,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.lang.String;
 
 
 /**
@@ -28,9 +30,11 @@ public class Player {
     Context context;
     int intSize = android.media.AudioTrack.getMinBufferSize(44100, AudioFormat.CHANNEL_OUT_MONO,
             AudioFormat.ENCODING_PCM_16BIT);
+    AudioManager am;
 
     public Player(Context context) {
         this.context = context;
+     am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
     }
 
     public void stopSample(final ArrayList<Sample> samples) {
@@ -185,7 +189,13 @@ public class Player {
                         Log.d("TCAudio", "audio track is not initialised ");
                         return;
                     }
-
+                    int latency = 0;
+                    try {
+                        Method m = am.getClass().getMethod("getOutputLatency", int.class);
+                        latency = (Integer) m.invoke(am, AudioManager.STREAM_MUSIC);
+                    } catch (Exception e) {
+                    }
+                    Log.d("getOutputLatency", String.valueOf(latency));
                     int count = 5292; // 512 kb
 //Reading the file..
                     byte[] byteData = null;
@@ -224,6 +234,7 @@ public class Player {
                     Log.d("FILELENGTH", String.valueOf(size));
                     long a = 1;
                     int i = 0;
+
                     while (bytesread <= size) {
                         if (i == 0)
                             a = System.currentTimeMillis();
@@ -240,6 +251,8 @@ public class Player {
                             // Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
                             at.write(byteData, 0, count);
                             at.play();
+
+                            Log.d("PLAXBACKPOS", String.valueOf(at.getPlaybackHeadPosition()));
                             if (i == 0)
                                 Log.d("PLAY1", String.valueOf(System.currentTimeMillis()));
                             if (i == 1)

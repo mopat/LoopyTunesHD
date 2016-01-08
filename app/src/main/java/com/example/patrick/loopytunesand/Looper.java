@@ -3,6 +3,7 @@ package com.example.patrick.loopytunesand;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.media.audiofx.Visualizer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -22,7 +23,7 @@ interface MetronomePreClick {
 }
 
 public class Looper extends AppCompatActivity implements MetronomeClick, MetronomePreClick {
-    private Button startMetronome, stopMetronome, stopRec;
+    private Button startMetronome, stopMetronome, emitClick;
     private Button sampleButtons[];
     private int bpm, beatCount, loopCount, clickedLoopCount;
     private Metronome m;
@@ -38,6 +39,8 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
     private MediaPlayer mp;
     private ArrayList<Sample> clickList = new ArrayList<>();
     private Sample clickSample;
+    private Visualizer v;
+    VisualizerView visualizerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +67,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
         startMetronome = (Button) findViewById(R.id.start_metronome);
         stopMetronome = (Button) findViewById(R.id.stop_metronome);
         metronomeTV = (TextView) findViewById(R.id.metronome_tv);
-        stopRec = (Button) findViewById(R.id.stop_rec);
+        emitClick = (Button) findViewById(R.id.emit_click);
         beatCount = 0;
         loopCount = 0;
         r = new Recorder();
@@ -76,6 +79,8 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
         latencyMetronomeThread.start();
         m.addMetronomeClickListener(this);
         lm.addMetronomePreClickListener(this);
+        v = new Visualizer(1);
+        visualizerView = (VisualizerView) findViewById(R.id.visualizer_view);
      /*   new Thread(new Runnable() {
             @Override
             public void run() {
@@ -85,6 +90,23 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
 */
 
 
+    }
+
+    private void calibrate() {
+        r.prepareRecorder();
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        mp.start();
+        r.startRecording();
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        r.stopRecording();
     }
 
     private void initListeners() {
@@ -118,10 +140,10 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
                 r.prepareRecorder();
             }
         });
-        stopRec.setOnClickListener(new View.OnClickListener() {
+        emitClick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                r.enableRecording();
+                calibrate();
 
             }
         });
@@ -130,7 +152,41 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
     private void addSample() {
         Sample sample = new Sample(r.getSamplePath());
         samples.add(sample);
+
+        setupVisualizerFxAndUI(sample);
+
+
         //samples.add(new Sample(Environment.getExternalStorageDirectory().getAbsolutePath() + "/LoopyTunesHD/sample.ogg"));
+    }
+
+    private void setupVisualizerFxAndUI(Sample sample) {
+        visualizerView.setEnabled(true);
+
+        v = new Visualizer(sample.getSampleAt().getAudioSessionId());
+        v.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
+        v.setEnabled(true);
+
+        visualizerView.updateVisualizer(sample.getByteData());
+
+        // Create the Visualizer object and attach it to our media player.
+
+        v.setDataCaptureListener(
+                new Visualizer.OnDataCaptureListener() {
+                    public void onWaveFormDataCapture(Visualizer visualizer,
+                                                      byte[] bytes, int samplingRate) {
+                        visualizerView.updateVisualizer(bytes);
+                        Log.d("VISUALITZER", String.valueOf(bytes));
+                    }
+
+                    public void onFftDataCapture(Visualizer visualizer,
+                                                 byte[] bytes, int samplingRate) {
+                        Log.d("VISUALITZER", String.valueOf(bytes));
+                }
+
+                    ;
+                }, Visualizer.getMaxCaptureRate() / 2, true, false);
+
+
     }
 
     private void getBPM() {
@@ -141,6 +197,10 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
         Log.d("BPM", String.valueOf(bpm));
         MediaPlayer m = MediaPlayer.create(this, R.raw.sample);
         Log.d("'SAMPLELENGTH", String.valueOf(m.getDuration()));
+    }
+
+    private void showWaveForm() {
+
     }
 
     long dif;
@@ -175,18 +235,19 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
                     button1Rec = false;
                     //Log.d("ClickTriggeredB", String.valueOf(System.currentTimeMillis()));
                     r.stopRecording();
+
                     Log.d("COUNTRECORDINGSTOP", String.valueOf(System.currentTimeMillis()));
                     Log.d("RECORDINGSTOP", String.valueOf(System.currentTimeMillis()));
                     addSample();
 
                 }
 
-               if (button1Rec && beatCount == 1) {
-                   // if (!isRecording) {
-                        //Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
-                        //r.startRecording();
-                        Log.d("RECORDINGSTARTHE", String.valueOf(System.currentTimeMillis()));
-                        //isRecording = true;
+                if (button1Rec && beatCount == 1) {
+                    // if (!isRecording) {
+                    //Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
+                    //r.startRecording();
+                    Log.d("RECORDINGSTARTHE", String.valueOf(System.currentTimeMillis()));
+                    //isRecording = true;
                     //}
                 }
 

@@ -33,7 +33,7 @@ public class Recorder {
     int bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
             RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 
-    int BufferElements2Rec = bufferSize / 2; // want to play 2048 (2K) since 2 bytes we use only 1024
+    int BufferElements2Rec = 1024 / 2; // want to play 2048 (2K) since 2 bytes we use only 1024
     int BytesPerElement = 2; // 2 bytes in 16bit format
     long a;
     File sample;
@@ -87,7 +87,7 @@ public class Recorder {
 
         samplePath = sample.getAbsolutePath();
         short sData[] = new short[BufferElements2Rec];
-
+int written = 0;
         FileOutputStream os = null;
         try {
             os = new FileOutputStream(samplePath);
@@ -114,7 +114,8 @@ public class Recorder {
 
                 Log.d("WRITEDIF", String.valueOf(b));
                 os.write(bData, 0, BufferElements2Rec * BytesPerElement);
-                //Log.d("ClickTriggeredB", String.valueOf(System.currentTimeMillis()));
+                written += bData.length;
+                Log.d("WRITTEN", String.valueOf(written));
             } catch (IOException e) {
                 e.printStackTrace();
             }
