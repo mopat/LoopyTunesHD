@@ -62,7 +62,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
     }
 
     private void init() {
-        mp = MediaPlayer.create(this, R.raw.click);
+        mp = MediaPlayer.create(this, R.raw.clickpcm);
         m = new Metronome(bpm);
         lm = new LatencyMetronome(bpm);
         c = getApplicationContext();

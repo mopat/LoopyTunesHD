@@ -8,7 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
-    Button startButton;
+    Button startButton, calibrateButton;
     EditText bpm;
 
     @Override
@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void init() {
         startButton = (Button) findViewById(R.id.start_button);
+        calibrateButton = (Button)findViewById(R.id.calibrate_button);
         bpm = (EditText) findViewById(R.id.bpm);
     }
     private void initListeners(){
@@ -32,6 +33,13 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = new Intent(MainActivity.this, Looper.class);
                 i.putExtra("bpm_value", String.valueOf(bpm.getText()));
                 startActivity(i);
+            }
+        });
+        calibrateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent j = new Intent(MainActivity.this, CalibrateActivity.class);
+                startActivity(j);
             }
         });
     }

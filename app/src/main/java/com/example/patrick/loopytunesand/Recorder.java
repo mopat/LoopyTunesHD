@@ -66,7 +66,7 @@ public class Recorder {
         Log.d("RECREADY", "STARTREC");
         a = System.currentTimeMillis();
         recordingThread.start();
-        st=System.currentTimeMillis();
+        st = System.currentTimeMillis();
     }
 
     //convert short to byte
@@ -86,8 +86,9 @@ public class Recorder {
         // Write the output audio in byte
 
         samplePath = sample.getAbsolutePath();
+
         short sData[] = new short[BufferElements2Rec];
-int written = 0;
+        int written = 0;
         FileOutputStream os = null;
         try {
             os = new FileOutputStream(samplePath);

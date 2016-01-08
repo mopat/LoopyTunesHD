@@ -211,6 +211,7 @@ public class Player {
                     file = new File(sample.filePath());
 
                     byteData = sample.getByteData();
+
                     FileInputStream in = null;
                     try {
                         in = new FileInputStream(file);
@@ -232,7 +233,7 @@ public class Player {
 
                     try {
                         //in.skip(7880);
-                        in.skip(skip);
+                        in.skip(0);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -257,11 +258,12 @@ public class Player {
 
                             Long g = System.currentTimeMillis();
                             // Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
-                            at.write(byteData, 0, count);
-                            at.play();
                             byte[] readBytes = new byte[ret];
                             System.arraycopy(byteData, 0, readBytes, 0, readBytes.length);
-                            update(readBytes);
+                            //update(readBytes);
+                            at.write(byteData, 0, count);
+                            at.play();
+
 
                             Log.d("PLAXBACKPOS", String.valueOf(at.getPlaybackHeadPosition()));
                             if (i == 0)
@@ -275,6 +277,7 @@ public class Player {
                             break;
                         }
                     }
+                    update(byteData);
                     try {
                         in.close();
                     } catch (IOException e) {

@@ -15,7 +15,14 @@
         android:text="Start"
         android:id="@+id/start_button">
     </Button>
-
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CCalibrate"
+        android:layout_marginTop="200dp"
+        android:id="@+id/calibrate_button"
+        android:layout_alignParentEnd="false">
+    </Button>
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

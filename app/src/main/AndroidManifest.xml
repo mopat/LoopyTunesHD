@@ -19,7 +19,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Looper"></activity>
+        <activity android:name=".Looper" />
+        <activity android:name=".CalibrateActivity"></activity>
     </application>
 
 </manifest>
