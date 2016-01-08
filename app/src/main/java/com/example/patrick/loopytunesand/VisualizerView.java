@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 public class VisualizerView extends View {
@@ -19,6 +20,7 @@ public class VisualizerView extends View {
     private Rect mRect = new Rect();
     private Paint mForePaint = new Paint();
     private int resolution;
+    int heightDiv;
 
     public VisualizerView(Context context) {
         super(context);
@@ -29,6 +31,7 @@ public class VisualizerView extends View {
         super(context, attrs);
         init();
         resolution = 256;
+        heightDiv = 2;
     }
 
     public VisualizerView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -59,13 +62,22 @@ public class VisualizerView extends View {
         }
         mRect.set(0, 0, getWidth(), getHeight());
         for (int i = 0; i < mBytes.length - 1; i++) {
-            mPoints[i * 4] = mRect.width() * i / (mBytes.length - 1);
-            mPoints[i * 4 + 1] = mRect.height() / 2
-                    + ((byte) (mBytes[i] + resolution)) * (mRect.height() / 2) / resolution;
-            mPoints[i * 4 + 2] = mRect.width() * (i + 1) / (mBytes.length - 1);
-            mPoints[i * 4 + 3] = mRect.height() / 2
-                    + ((byte) (mBytes[i + 1] + resolution)) * (mRect.height() / 2)
-                    / resolution;
+            if (mBytes[i] < -110 || mBytes[i] > 110) {
+                //Log.d("MBYTES", String.valueOf(mBytes[i]));
+                mPoints[i * 4] = mRect.width() * i / (mBytes.length - 1);
+                mPoints[i * 4 + 1] = mRect.height() / heightDiv
+                        + ((byte) (mBytes[i] + resolution)) * (mRect.height() / heightDiv) / resolution;
+                mPoints[i * 4 + 2] = mRect.width() * (i + 1) / (mBytes.length - 1);
+                mPoints[i * 4 + 3] = mRect.height() / heightDiv
+                        + ((byte) (mBytes[i + 1] + resolution)) * (mRect.height() / heightDiv)
+                        / resolution;
+            } else {
+                mPoints[i * 4] = 1;
+                mPoints[i * 4 + 1] = 1;
+                mPoints[i * 4 + 2] = 1;
+                mPoints[i * 4 + 3] = 1;
+            }
+
         }
         canvas.drawLines(mPoints, mForePaint);
     }

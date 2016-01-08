@@ -10,17 +10,22 @@ import android.widget.Button;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class CalibrateActivity extends AppCompatActivity implements PlayerUpdate {
     MediaPlayer mp;
-    private Button calibrateButton;
+    private Button calibrateButton, testCalibrationButton;
     private VisualizerView visualizerViewOutput, visualizerViewInput;
     private Visualizer outputVisualizer, inputVisualizer;
     List<Byte> bytesList = new ArrayList<Byte>();
     private Recorder r;
     private Player player;
+    ArrayList<Sample> samples = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,23 +42,49 @@ public class CalibrateActivity extends AppCompatActivity implements PlayerUpdate
         r = new Recorder();
         player.addUpdateListener(this);
         calibrateButton = (Button) findViewById(R.id.start_calibration_button);
+        testCalibrationButton = (Button)findViewById(R.id.test_calibration_button);
         visualizerViewOutput = (VisualizerView) findViewById(R.id.output_visualizer);
         visualizerViewInput = (VisualizerView) findViewById(R.id.input_visualizer);
     }
 
     private void initListeners() {
-        String clickFilePath = Absolutes.DIRECTORY + "/yo.pcm";
+        String clickFilePath = Absolutes.DIRECTORY + "/clicks.pcm";
         Sample s = new Sample(clickFilePath);
-        final ArrayList<Sample> samples = new ArrayList<>();
+
         samples.add(s);
         r.prepareRecorder();
         calibrateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //setupVisualization();
-                player.playSamples(samples, 0);
 
-                r.startRecording();
+
+           /*     try {
+                    Thread.sleep(600);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }*/
+
+                if (samples.size() > 1)
+                    samples.remove(1);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        player.playSamples(samples, 0);                  }
+                }).start();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        r.startRecording();
+                    }
+                }).start();
+            }
+        });
+        testCalibrationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                player.stopSample(samples);
+                player.playSamples(samples, 0);
             }
         });
     }
@@ -68,32 +99,53 @@ public class CalibrateActivity extends AppCompatActivity implements PlayerUpdate
 
                 visualizerViewOutput.updateVisualizer(playedBytes);
                 File f = new File(r.getSamplePath());
+
                 byte[] byteArray = readContentIntoByteArray(f);
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(Absolutes.DIRECTORY+"/recordedsample.pcm");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    fos.write(byteArray);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                recordedSample = new Sample(Absolutes.DIRECTORY+"/recordedsample.pcm");
+                samples.add(recordedSample);
                 visualizerViewInput.updateVisualizer(byteArray);
             }
         });
 
     }
+    Sample recordedSample;
     private static byte[] readContentIntoByteArray(File file)
     {
         FileInputStream fileInputStream = null;
         byte[] bFile = new byte[(int) file.length()];
+        int toCut = 32876;
+        byte[] cut = new byte[(int)file.length()-toCut];
         try
         {
             //convert file into array of bytes
             fileInputStream = new FileInputStream(file);
             fileInputStream.read(bFile);
             fileInputStream.close();
-            for (int i = 0; i < bFile.length; i++)
-            {
-                System.out.print((char) bFile[i]);
-            }
+
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        return bFile;
+        System.arraycopy(bFile, toCut, cut, 0, cut.length);
+        return cut;
     }
 
     private void setupVisualizerFxAndUI(byte[] playedBytes) {

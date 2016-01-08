@@ -219,7 +219,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
 
                 if (mp.isPlaying())
                     mp.stop();
-                mp.start();
+                //mp.start();
                 beatCount++;
                 if (beatCount == 5)
                     beatCount = 1;
