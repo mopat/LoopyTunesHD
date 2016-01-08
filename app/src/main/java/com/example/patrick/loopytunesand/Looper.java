@@ -22,7 +22,11 @@ interface MetronomePreClick {
     void metronomePreClick();
 }
 
-public class Looper extends AppCompatActivity implements MetronomeClick, MetronomePreClick {
+interface PlayerUpdate {
+    void playerUpdate(byte[] playedBytes);
+}
+
+public class Looper extends AppCompatActivity implements MetronomeClick, MetronomePreClick, PlayerUpdate {
     private Button startMetronome, stopMetronome, emitClick;
     private Button sampleButtons[];
     private int bpm, beatCount, loopCount, clickedLoopCount;
@@ -72,6 +76,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
         loopCount = 0;
         r = new Recorder();
         p = new Player(c);
+        p.addUpdateListener(this);
         sampleButtons = new Button[]{(Button) findViewById(R.id.sample_one)};
         metronomeThread = new Thread(m);
         metronomeThread.start();
@@ -152,21 +157,21 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
     private void addSample() {
         Sample sample = new Sample(r.getSamplePath());
         samples.add(sample);
-
-        setupVisualizerFxAndUI(sample);
-
-
-        //samples.add(new Sample(Environment.getExternalStorageDirectory().getAbsolutePath() + "/LoopyTunesHD/sample.ogg"));
-    }
-
-    private void setupVisualizerFxAndUI(Sample sample) {
         visualizerView.setEnabled(true);
 
         v = new Visualizer(sample.getSampleAt().getAudioSessionId());
         v.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
         v.setEnabled(true);
 
-        visualizerView.updateVisualizer(sample.getByteData());
+
+
+        //samples.add(new Sample(Environment.getExternalStorageDirectory().getAbsolutePath() + "/LoopyTunesHD/sample.ogg"));
+    }
+
+    private void setupVisualizerFxAndUI(Sample sample, byte[] playedBytes) {
+
+
+        visualizerView.updateVisualizer(playedBytes);
 
         // Create the Visualizer object and attach it to our media player.
 
@@ -181,7 +186,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
                     public void onFftDataCapture(Visualizer visualizer,
                                                  byte[] bytes, int samplingRate) {
                         Log.d("VISUALITZER", String.valueOf(bytes));
-                }
+                    }
 
                     ;
                 }, Visualizer.getMaxCaptureRate() / 2, true, false);
@@ -199,9 +204,6 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
         Log.d("'SAMPLELENGTH", String.valueOf(m.getDuration()));
     }
 
-    private void showWaveForm() {
-
-    }
 
     long dif;
     int beatCount2 = 0;
@@ -321,5 +323,21 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
 
             }
         }).start();
+    }
+
+    @Override
+    public void playerUpdate(final byte[] playedBytes) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                for (Sample s : samples) {
+
+                    setupVisualizerFxAndUI(s, playedBytes);
+                }
+            }
+        });
+
+
     }
 }

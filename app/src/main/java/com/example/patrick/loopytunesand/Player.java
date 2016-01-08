@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.lang.String;
@@ -31,10 +32,21 @@ public class Player {
     int intSize = android.media.AudioTrack.getMinBufferSize(44100, AudioFormat.CHANNEL_OUT_MONO,
             AudioFormat.ENCODING_PCM_16BIT);
     AudioManager am;
+    private List<PlayerUpdate> updateListeners = new ArrayList<PlayerUpdate>();
 
     public Player(Context context) {
         this.context = context;
-     am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+    }
+
+    public void addUpdateListener(PlayerUpdate listener) {
+        updateListeners.add(listener);
+    }
+
+    void update(byte[] playedBytes){
+        for(PlayerUpdate listener: updateListeners){
+            listener.playerUpdate(playedBytes);
+        }
     }
 
     public void stopSample(final ArrayList<Sample> samples) {
@@ -190,11 +202,7 @@ public class Player {
                         return;
                     }
                     int latency = 0;
-                    try {
-                        Method m = am.getClass().getMethod("getOutputLatency", int.class);
-                        latency = (Integer) m.invoke(am, AudioManager.STREAM_MUSIC);
-                    } catch (Exception e) {
-                    }
+
                     Log.d("getOutputLatency", String.valueOf(latency));
                     int count = 5292; // 512 kb
 //Reading the file..
@@ -251,6 +259,9 @@ public class Player {
                             // Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
                             at.write(byteData, 0, count);
                             at.play();
+                            byte[] readBytes = new byte[ret];
+                            System.arraycopy(byteData, 0, readBytes, 0, readBytes.length);
+                            update(readBytes);
 
                             Log.d("PLAXBACKPOS", String.valueOf(at.getPlaybackHeadPosition()));
                             if (i == 0)
