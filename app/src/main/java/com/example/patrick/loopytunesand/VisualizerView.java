@@ -18,6 +18,7 @@ public class VisualizerView extends View {
     private float[] mPoints;
     private Rect mRect = new Rect();
     private Paint mForePaint = new Paint();
+    private int resolution;
 
     public VisualizerView(Context context) {
         super(context);
@@ -27,6 +28,7 @@ public class VisualizerView extends View {
     public VisualizerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
+        resolution = 256;
     }
 
     public VisualizerView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -59,11 +61,11 @@ public class VisualizerView extends View {
         for (int i = 0; i < mBytes.length - 1; i++) {
             mPoints[i * 4] = mRect.width() * i / (mBytes.length - 1);
             mPoints[i * 4 + 1] = mRect.height() / 2
-                    + ((byte) (mBytes[i] + 512)) * (mRect.height() / 2) / 512;
+                    + ((byte) (mBytes[i] + resolution)) * (mRect.height() / 2) / resolution;
             mPoints[i * 4 + 2] = mRect.width() * (i + 1) / (mBytes.length - 1);
             mPoints[i * 4 + 3] = mRect.height() / 2
-                    + ((byte) (mBytes[i + 1] + 512)) * (mRect.height() / 2)
-                    / 512;
+                    + ((byte) (mBytes[i + 1] + resolution)) * (mRect.height() / 2)
+                    / resolution;
         }
         canvas.drawLines(mPoints, mForePaint);
     }
