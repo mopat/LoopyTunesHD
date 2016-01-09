@@ -1,15 +1,19 @@
 package com.example.patrick.loopytunesand;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -43,8 +47,8 @@ public class Player {
         updateListeners.add(listener);
     }
 
-    void update(byte[] playedBytes){
-        for(PlayerUpdate listener: updateListeners){
+    void update(byte[] playedBytes) {
+        for (PlayerUpdate listener : updateListeners) {
             listener.playerUpdate(playedBytes);
         }
     }
@@ -70,12 +74,14 @@ public class Player {
         stopThread.start();
     }
 
-long c;
+    long c;
+
     public void playSamples(final ArrayList<Sample> samples, final int beatcount) {
 
         for (int i = 0; i < samples.size(); i++) {
             final Sample sample = samples.get(i);
             new Thread(new Runnable() {
+                @TargetApi(Build.VERSION_CODES.M)
                 @Override
                 public void run() {
 
@@ -211,12 +217,14 @@ long c;
                     file = new File(sample.filePath());
 
                     byteData = sample.getByteData();
-
+                    BufferedInputStream bis = null;
                     FileInputStream in = null;
+                    DataInputStream dis = null;
                     try {
                         in = new FileInputStream(file);
 
-
+                        bis = new BufferedInputStream(in);
+                        dis = new DataInputStream(bis);
                     } catch (FileNotFoundException e) {
 // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -233,7 +241,7 @@ long c;
 
                     try {
                         //in.skip(7880);
-                        in.skip(skip);
+                        in.skip(0);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -245,15 +253,15 @@ long c;
                     int i = 0;
 
                     while (bytesread <= size) {
-                        if (i == 0){
+                        if (i == 0) {
                             a = System.currentTimeMillis();
                             c = System.currentTimeMillis();
-                           // Log.d("CURRRI", String.valueOf(c));
+                            // Log.d("CURRRI", String.valueOf(c));
                         }
 
 
                         try {
-                            ret = in.read(byteData, 0, count);
+                            ret = bis.read(byteData, 0, count);
                             // Log.d("BYTESREAD", String.valueOf(ret));
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -269,6 +277,9 @@ long c;
                             at.play();
 
 
+                            //at.write(sample.getByteBuffer(), size, AudioTrack.WRITE_NON_BLOCKING, System.currentTimeMillis());
+                            //at.play();
+
 
                             bytesread += ret;
                         } else {
@@ -276,7 +287,8 @@ long c;
                             Log.d("SKIPPING", String.valueOf(d));
                             break;
                         }
-                    }i++;
+                    }
+                    i++;
                     update(byteData);
                     try {
                         in.close();

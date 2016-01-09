@@ -66,7 +66,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
         m = new Metronome(bpm);
         lm = new LatencyMetronome(bpm);
         c = getApplicationContext();
-        clickSample = new Sample(Absolutes.DIRECTORY + "/click.pcm");
+        //clickSample = new Sample(Absolutes.DIRECTORY + "/click.pcm");
         clickList.add(clickSample);
         startMetronome = (Button) findViewById(R.id.start_metronome);
         stopMetronome = (Button) findViewById(R.id.stop_metronome);
@@ -250,9 +250,10 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
                     // if (!isRecording) {
                     //Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
                     r.startRecording();
-                    Log.d("RECORDINGSTARTHE", String.valueOf(System.currentTimeMillis()));
+                    Log.d("WRITEAUDIOFILEA", String.valueOf(System.currentTimeMillis()));
+                    //Log.d("RECORDINGSTARTHE", String.valueOf(System.currentTimeMillis()));
                     written = r.getWrittenAtTime();
-                    Log.d("WRITTENATTIME", String.valueOf(written));
+                    //Log.d("WRITTENATTIME", String.valueOf(written));
                     isRecording = true;
                     //}
                 }

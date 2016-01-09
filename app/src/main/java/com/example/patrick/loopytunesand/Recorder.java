@@ -9,13 +9,16 @@ import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 
 /**
@@ -90,18 +93,21 @@ public class Recorder {
         short sData[] = new short[BufferElements2Rec];
 
         FileOutputStream os = null;
+        BufferedOutputStream bos = null;
+        DataOutputStream dos = null;
         try {
             os = new FileOutputStream(samplePath);
+            bos = new BufferedOutputStream(os);
+            dos = new DataOutputStream(bos);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
         long b = System.currentTimeMillis() - a;
-
+        Log.d("WRITEAUDIOFILEB", String.valueOf(System.currentTimeMillis()));
         while (isRecording) {
             // gets the voice output from microphone to byte format
 
-            Log.d("ENABLED", String.valueOf(enableRecording));
 
             recorder.read(sData, 0, BufferElements2Rec);
 
@@ -114,19 +120,19 @@ public class Recorder {
 
 
                 Log.d("WRITEDIF", String.valueOf(b));
-                os.write(bData, 0, BufferElements2Rec * BytesPerElement);
+                bos.write(bData, 0, BufferElements2Rec * BytesPerElement);
                 written += bData.length;
                 Log.d("WRITTEN", String.valueOf(written));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-written = 0;
+        written = 0;
     }
 
     int written = 0;
 
-    public int getWrittenAtTime(){
+    public int getWrittenAtTime() {
         return written;
     }
 
