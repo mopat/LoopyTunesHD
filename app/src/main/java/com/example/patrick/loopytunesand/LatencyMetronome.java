@@ -44,7 +44,7 @@ public class LatencyMetronome implements Runnable {
         while (running) {
             if (i > 3) {
                 long curTime = System.currentTimeMillis();
-                if (curTime - startTime1 >= barTimeNano) {
+                if (curTime - startTime1 == barTimeNano) {
                     //Log.d("TIMECUR", String.valueOf(curTime - startTime));
                     //Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
                     startTime1 = curTime;
@@ -56,7 +56,7 @@ public class LatencyMetronome implements Runnable {
 
             if (i <= 3) {
                 long curTime = System.currentTimeMillis();
-                if (curTime - startTime2 >= barTimeNano -75) {
+                if (curTime - startTime2 >= barTimeNano + 82) {
                     //Log.d("TIMECUR", String.valueOf(curTime - startTime));
                     //Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
                     startTime2 = curTime;

@@ -142,6 +142,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
                 clickedLoopCount = loopCount;
                 clickedLoopCount2 = loopCount2;
                 button1Rec = true;
+
                 r.prepareRecorder();
             }
         });
@@ -217,9 +218,10 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
             @Override
             public void run() {
 
+
                 if (mp.isPlaying())
                     mp.stop();
-                //mp.start();
+                mp.start();
                 beatCount++;
                 if (beatCount == 5)
                     beatCount = 1;
@@ -232,7 +234,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
                 metronomeTV.setText(String.valueOf(beatCount));
                 Log.d("COUNTBEAT", String.valueOf(beatCount));
                 Log.d("COUNTLOOP", String.valueOf(loopCount));
-                if (clickedLoopCount + 2 == loopCount && button1Rec) {
+        /*        if (clickedLoopCount + 2 == loopCount && button1Rec) {
                     isRecording = false;
                     button1Rec = false;
                     //Log.d("ClickTriggeredB", String.valueOf(System.currentTimeMillis()));
@@ -242,15 +244,24 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
                     Log.d("RECORDINGSTOP", String.valueOf(System.currentTimeMillis()));
                     addSample();
 
-                }
+                }*/
 
-                if (button1Rec && beatCount == 1) {
+                if (button1Rec && beatCount == 1 && clickedLoopCount + 1 == loopCount) {
                     // if (!isRecording) {
                     //Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
-                    //r.startRecording();
+                    r.startRecording();
                     Log.d("RECORDINGSTARTHE", String.valueOf(System.currentTimeMillis()));
-                    //isRecording = true;
+                    written = r.getWrittenAtTime();
+                    Log.d("WRITTENATTIME", String.valueOf(written));
+                    isRecording = true;
                     //}
+                }
+                if (beatCount == 1) {
+                    Log.d("SPLAY", "Play");
+                    stopSamples();
+                    playSamples();
+                    Log.d("METROONE", String.valueOf(System.currentTimeMillis()));
+
                 }
 
             /*    System.out.println(button1Rec);
@@ -262,7 +273,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
         });
 
     }
-
+int written = 0;
     private void stopSamples() {
         p.stopSample(samples);
     }
@@ -301,25 +312,31 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
                 if (beatCount2 == 1) {
                     loopCount2++;
                 }
-                if (beatCount2 == 1) {
-                    Log.d("SPLAY", "Play");
-                    stopSamples();
-                    playSamples();
-                    Log.d("METROONE", String.valueOf(System.currentTimeMillis()));
+                if (clickedLoopCount + 2 == loopCount2 && button1Rec) {
+                    isRecording = false;
+                    button1Rec = false;
+                    //Log.d("ClickTriggeredB", String.valueOf(System.currentTimeMillis()));
+                    r.stopRecording();
+
+                    Log.d("COUNTRECORDINGSTOP", String.valueOf(System.currentTimeMillis()));
+                    Log.d("RECORDINGSTOP", String.valueOf(System.currentTimeMillis()));
+                    addSample();
 
                 }
                 //pr("METROCLICK", String.valueOf(System.currentTimeMillis() - kif));
 
-                Log.d("COUNTBEAT", String.valueOf(beatCount2));
+             /*   Log.d("COUNTBEAT", String.valueOf(beatCount2));
                 if (button1Rec && beatCount2 == 1) {
                     if (!isRecording) {
                         //Log.d("ClickTriggeredA", String.valueOf(System.currentTimeMillis()));
+
                         r.startRecording();
+
                         Log.d("RECORDINGSTART", String.valueOf(System.currentTimeMillis()));
                         //pr("METROLATENCY", String.valueOf(kif));
                         isRecording = true;
                     }
-                }
+                }*/
 
             }
         }).start();
@@ -327,16 +344,7 @@ public class Looper extends AppCompatActivity implements MetronomeClick, Metrono
 
     @Override
     public void playerUpdate(final byte[] playedBytes) {
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
 
-                for (Sample s : samples) {
-
-                    setupVisualizerFxAndUI(s, playedBytes);
-                }
-            }
-        });
 
 
     }

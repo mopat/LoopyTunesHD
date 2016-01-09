@@ -33,7 +33,7 @@ public class Recorder {
     int bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
             RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 
-    int BufferElements2Rec = 1024 / 2; // want to play 2048 (2K) since 2 bytes we use only 1024
+    int BufferElements2Rec = 512 / 2; // want to play 2048 (2K) since 2 bytes we use only 1024
     int BytesPerElement = 2; // 2 bytes in 16bit format
     long a;
     File sample;
@@ -41,12 +41,6 @@ public class Recorder {
     public void prepareRecorder() {
         System.out.print("STARTRECORD");
 
-        try {
-            sample = File.createTempFile("smp", ".pcm", Absolutes.DIRECTORY);
-        } catch (IOException e) {
-            Log.e("ERROR", "sdcard access error");
-            return;
-        }
         recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                 RECORDER_SAMPLERATE, RECORDER_CHANNELS,
                 RECORDER_AUDIO_ENCODING, BufferElements2Rec * BytesPerElement);
@@ -85,10 +79,16 @@ public class Recorder {
     private void writeAudioDataToFile() {
         // Write the output audio in byte
 
+        try {
+            sample = File.createTempFile("yay", ".pcm", Absolutes.DIRECTORY);
+        } catch (IOException e) {
+            Log.e("ERROR", "sdcard access error");
+            return;
+        }
         samplePath = sample.getAbsolutePath();
 
         short sData[] = new short[BufferElements2Rec];
-        int written = 0;
+
         FileOutputStream os = null;
         try {
             os = new FileOutputStream(samplePath);
@@ -121,7 +121,13 @@ public class Recorder {
                 e.printStackTrace();
             }
         }
+written = 0;
+    }
 
+    int written = 0;
+
+    public int getWrittenAtTime(){
+        return written;
     }
 
     public void stopRecording() {

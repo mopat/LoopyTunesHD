@@ -70,7 +70,7 @@ public class Player {
         stopThread.start();
     }
 
-
+long c;
     public void playSamples(final ArrayList<Sample> samples, final int beatcount) {
 
         for (int i = 0; i < samples.size(); i++) {
@@ -204,7 +204,7 @@ public class Player {
                     int latency = 0;
 
                     Log.d("getOutputLatency", String.valueOf(latency));
-                    int count = 5292; // 512 kb
+                    int count = 128; // 512 kb
 //Reading the file..
                     byte[] byteData = null;
                     File file = null;
@@ -221,7 +221,7 @@ public class Player {
 // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-                    int skip = 32876;
+                    int skip = 28224;
                    /*     if(beatcount == 1)
                             skip = 0;
                         if(beatcount == 2)
@@ -233,7 +233,7 @@ public class Player {
 
                     try {
                         //in.skip(7880);
-                        in.skip(0);
+                        in.skip(skip);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -245,9 +245,13 @@ public class Player {
                     int i = 0;
 
                     while (bytesread <= size) {
-                        if (i == 0)
+                        if (i == 0){
                             a = System.currentTimeMillis();
-                        i++;
+                            c = System.currentTimeMillis();
+                           // Log.d("CURRRI", String.valueOf(c));
+                        }
+
+
                         try {
                             ret = in.read(byteData, 0, count);
                             // Log.d("BYTESREAD", String.valueOf(ret));
@@ -265,18 +269,14 @@ public class Player {
                             at.play();
 
 
-                            Log.d("PLAXBACKPOS", String.valueOf(at.getPlaybackHeadPosition()));
-                            if (i == 0)
-                                Log.d("PLAY1", String.valueOf(System.currentTimeMillis()));
-                            if (i == 1)
-                                Log.d("PLAY2", String.valueOf(System.currentTimeMillis()));
+
                             bytesread += ret;
                         } else {
                             long d = System.currentTimeMillis() - a;
                             Log.d("SKIPPING", String.valueOf(d));
                             break;
                         }
-                    }
+                    }i++;
                     update(byteData);
                     try {
                         in.close();
@@ -287,6 +287,7 @@ public class Player {
                     at.stop();
                     at.release();
                 }
+
             }).start();
 
 

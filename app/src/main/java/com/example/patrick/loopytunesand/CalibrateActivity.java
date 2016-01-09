@@ -36,6 +36,7 @@ public class CalibrateActivity extends AppCompatActivity implements PlayerUpdate
         init();
         initListeners();
         initOutputVisualizer();
+        r.prepareRecorder();
     }
 
     private void init() {
@@ -101,7 +102,7 @@ public class CalibrateActivity extends AppCompatActivity implements PlayerUpdate
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            r.prepareRecorder();
+
                             r.startRecording();
                         }
                     }).start();
